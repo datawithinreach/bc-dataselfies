@@ -11,13 +11,17 @@ Inspired by Giorgia Lupi's [Data Selfies at TED
 
 ## How it's built
 
-- One app, two routes, no internet required at the venue:
+- One static app, two routes, **no server, no internet, no database**:
   - `/submit` — the questionnaire (laptop)
   - `/display` — the live wall + legend (monitor)
-- Express + WebSocket backend broadcasts every new submission instantly to
-  the display.
-- Responses persist to `data/responses.json` on disk (no database to install,
-  no cloud dependency, survives a server restart).
+- Responses are stored in the browser's `localStorage`. `/submit` and
+  `/display` are just two windows of the *same browser*, so they share that
+  storage automatically, and a `BroadcastChannel` tells the other window the
+  instant a new response is saved (see [`src/lib/storage.ts`](src/lib/storage.ts)).
+- This intentionally only supports a **single-laptop kiosk**: both windows
+  must be the same browser, same machine, not incognito/private mode. If you
+  ever want visitors to submit from their own phones, this approach won't
+  work as-is — that needs a real backend again.
 - Visual vocabulary, color palette, and question copy all live in
   [`shared/questions.ts`](shared/questions.ts) and
   [`shared/palette.ts`](shared/palette.ts) — edit those to change the
@@ -30,49 +34,39 @@ npm install
 npm run dev
 ```
 
-This starts the Vite dev server (`:5173`) and the API/WebSocket server
-(`:8787`) together, with `/api` and `/ws` proxied through Vite. Open:
+Open in your browser:
 
 - `http://localhost:5173/submit` on the laptop
-- `http://localhost:5173/display` on the monitor (full-screen the browser
-  window, e.g. `F11`)
+- `http://localhost:5173/display` in a second window/tab (full-screen it on
+  the monitor, e.g. `F11`)
 
-Both pages work in separate windows/tabs on the **same machine** — nothing
-needs network access beyond localhost, so it'll work even if the building
-WiFi is flaky.
+Because it's a static site, this works with zero network access beyond
+localhost — it'll run fine even if the building WiFi is flaky or down.
 
 ### Production build (recommended for the actual event)
 
-The dev server is fine, but for the event itself run the built, production
-version — it's faster and doesn't need two terminals:
-
 ```bash
 npm run build
-npm start
+npm run preview
 ```
 
-This serves everything from a single process on `http://localhost:8787`
-(`/submit` and `/display`).
+`preview` serves the built app at `http://localhost:4173` — faster than the
+dev server and closer to how it'll behave on the day. (Don't just double-click
+`dist/index.html` to open it — opening a file directly gives each window its
+own `file://` origin in some browsers, which breaks the localStorage/
+BroadcastChannel sync between the two windows. Always serve it over
+`http://localhost`.)
 
 ## Day-of checklist
 
-- [ ] `npm start` on the laptop that will drive both screens.
-- [ ] Open `http://localhost:8787/submit` in one window (or on the laptop's
-      own screen).
-- [ ] Open `http://localhost:8787/display` in a second window, drag it to the
-      external monitor, and full-screen it.
+- [ ] `npm run build && npm run preview` on the laptop that will drive both
+      screens.
+- [ ] Open `http://localhost:4173/submit` in one window.
+- [ ] Open `http://localhost:4173/display` in a second window **of the same
+      browser**, drag it to the external monitor, and full-screen it.
 - [ ] Submit a couple of test entries to confirm the wall updates live, then
-      **reset** so the display starts empty for real visitors:
-
-  ```bash
-  curl -X POST http://localhost:8787/api/reset \
-    -H 'Content-Type: application/json' \
-    -d '{"token":"bc-open-house"}'
-  ```
-
-  (Change the token via the `RESET_TOKEN` env var if you want something less
-  guessable — it only guards against an accidental wipe mid-event, not a
-  determined attacker.)
+      click the small "Reset wall" link in the bottom-left corner of
+      `/display` to clear it before real visitors start.
 
 ## Customizing
 
@@ -83,5 +77,5 @@ This serves everything from a single process on `http://localhost:8787`
 - **Cluster grouping on the display** — currently clusters by school/dept
   (`src/lib/useForceLayout.ts`); change `clusterCenters()` to cluster by a
   different field if you'd rather group by affiliation type, for example.
-- **Names are collected but never rendered** on `/display` — only used
-  server-side/in the stored data, per BC CS's request.
+- **Names are collected but never rendered** on `/display` — they're only
+  stored alongside the other answers in `localStorage`, per BC CS's request.

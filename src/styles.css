@@ -218,16 +218,23 @@ body {
   background: radial-gradient(circle at 30% 20%, #faf7f0 0%, var(--bg) 60%);
 }
 
-.conn-badge {
+.reset-btn {
   position: absolute;
-  top: 16px;
-  left: 16px;
-  background: var(--dark-maroon);
-  color: white;
+  bottom: 12px;
+  left: 12px;
+  background: transparent;
+  border: none;
+  color: var(--border);
   font-family: system-ui, sans-serif;
-  font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 999px;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 4px 6px;
+  opacity: 0.5;
+}
+
+.reset-btn:hover {
+  opacity: 1;
+  color: var(--warm-gray);
 }
 
 .empty-state {

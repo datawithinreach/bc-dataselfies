@@ -112,45 +112,6 @@ export interface ResponseRecord extends ResponseInput {
   createdAt: number;
 }
 
-export const REQUIRED_FIELDS: (keyof ResponseInput)[] = [
-  "name",
-  "affiliation",
-  "school",
-  "continent",
-  "chronotype",
-  "bestIdeas",
-  "rules",
-  "emailAnxiety",
-  "aiFuture",
-];
-
-const VALID_VALUES: Record<Exclude<keyof ResponseInput, "name">, Set<string>> = {
-  affiliation: new Set(affiliationOptions.map((o) => o.value)),
-  school: new Set(schoolOptions.map((o) => o.value)),
-  continent: new Set(continentOptions.map((o) => o.value)),
-  chronotype: new Set(chronotypeOptions.map((o) => o.value)),
-  bestIdeas: new Set(bestIdeasOptions.map((o) => o.value)),
-  rules: new Set(rulesOptions.map((o) => o.value)),
-  emailAnxiety: new Set(emailAnxietyOptions.map((o) => o.value)),
-  aiFuture: new Set(aiFutureOptions.map((o) => o.value)),
-};
-
-export function validateResponse(input: Partial<ResponseInput>): string | null {
-  for (const field of REQUIRED_FIELDS) {
-    const value = input[field];
-    if (typeof value !== "string" || value.trim().length === 0) {
-      return `Missing field: ${field}`;
-    }
-  }
-  if (input.name!.trim().length > 80) return "Name is too long";
-  for (const field of Object.keys(VALID_VALUES) as (keyof typeof VALID_VALUES)[]) {
-    if (!VALID_VALUES[field].has(input[field]!)) {
-      return `Invalid value for ${field}`;
-    }
-  }
-  return null;
-}
-
 export function findOption<T extends Option>(options: T[], value: string): T {
   const found = options.find((o) => o.value === value);
   if (!found) throw new Error(`Unknown option value: ${value}`);

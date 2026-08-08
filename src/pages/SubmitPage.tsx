@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { nanoid } from "nanoid";
 import type { ResponseInput, ResponseRecord } from "../../shared/questions";
 import {
   affiliationOptions,
@@ -11,6 +12,7 @@ import {
   aiFutureOptions,
 } from "../../shared/questions";
 import PortraitMark from "../components/PortraitMark";
+import { addResponse } from "../lib/storage";
 
 type Draft = Partial<ResponseInput>;
 
@@ -54,7 +56,6 @@ function RadioQuestion<T extends { value: string; label: string }>({
 
 export default function SubmitPage() {
   const [draft, setDraft] = useState<Draft>(EMPTY);
-  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState<ResponseRecord | null>(null);
 
@@ -77,31 +78,28 @@ export default function SubmitPage() {
     return fields.some((f) => !draft[f] || String(draft[f]).trim().length === 0);
   };
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (requiredMissing()) {
       setError("Please answer every question before submitting.");
       return;
     }
     setError(null);
-    setSubmitting(true);
-    try {
-      const res = await fetch("/api/responses", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(draft),
-      });
-      if (!res.ok) {
-        const body = await res.json().catch(() => ({}));
-        throw new Error(body.error ?? "Something went wrong");
-      }
-      const record: ResponseRecord = await res.json();
-      setSubmitted(record);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong");
-    } finally {
-      setSubmitting(false);
-    }
+    const record: ResponseRecord = {
+      id: nanoid(10),
+      name: draft.name!.trim(),
+      affiliation: draft.affiliation!,
+      school: draft.school!,
+      continent: draft.continent!,
+      chronotype: draft.chronotype!,
+      bestIdeas: draft.bestIdeas!,
+      rules: draft.rules!,
+      emailAnxiety: draft.emailAnxiety!,
+      aiFuture: draft.aiFuture!,
+      createdAt: Date.now(),
+    };
+    addResponse(record);
+    setSubmitted(record);
   }
 
   function startOver() {
@@ -168,8 +166,8 @@ export default function SubmitPage() {
 
         {error && <p className="error">{error}</p>}
 
-        <button className="primary" type="submit" disabled={submitting}>
-          {submitting ? "Submitting..." : "Submit & see my data selfie"}
+        <button className="primary" type="submit">
+          Submit & see my data selfie
         </button>
       </form>
     </div>

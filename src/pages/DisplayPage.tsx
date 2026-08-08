@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useResponses } from "../lib/useResponses";
 import { useForceLayout } from "../lib/useForceLayout";
+import { resetResponses } from "../lib/storage";
 import PortraitMark from "../components/PortraitMark";
 import Legend from "../components/Legend";
 
@@ -24,8 +25,14 @@ function useElementSize<T extends HTMLElement>() {
   return [ref, size] as const;
 }
 
+function handleResetClick() {
+  if (window.confirm("Clear all portraits from the wall? This can't be undone.")) {
+    resetResponses();
+  }
+}
+
 export default function DisplayPage() {
-  const { records, connected } = useResponses();
+  const { records } = useResponses();
   const [canvasRef, { width, height }] = useElementSize<HTMLDivElement>();
   const nodes = useForceLayout(records, width, height);
 
@@ -37,12 +44,14 @@ export default function DisplayPage() {
             <PortraitMark key={n.id} record={n.record} x={n.x ?? 0} y={n.y ?? 0} r={n.r} />
           ))}
         </svg>
-        {!connected && <div className="conn-badge">Reconnecting…</div>}
         {records.length === 0 && (
           <div className="empty-state">
-            <p>No portraits yet — scan the QR code or visit the laptop to submit yours!</p>
+            <p>No portraits yet — visit the laptop to submit yours!</p>
           </div>
         )}
+        <button className="reset-btn" onClick={handleResetClick}>
+          Reset wall
+        </button>
       </div>
       <Legend count={records.length} />
     </div>
