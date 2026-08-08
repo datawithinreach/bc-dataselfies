@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { HashRouter, Routes, Route, Navigate } from "react-router-dom";
 import SubmitPage from "./pages/SubmitPage";
 import DisplayPage from "./pages/DisplayPage";
+import "@fontsource/caveat/latin-700.css";
 import "./styles.css";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(

@@ -10,7 +10,8 @@ import {
   findOption,
 } from "../../shared/questions";
 import { makeRng } from "../lib/hash";
-import { AffiliationMark, ContinentLines, TrendArc, ChronotypeMark, DiningDots } from "../lib/marks";
+import { getInitials } from "../lib/text";
+import { AffiliationMark, ContinentLines, TrendArc, ChronotypeMark, DiningDots, InitialsMonogram } from "../lib/marks";
 
 // The affiliation shape is drawn a bit smaller than the full radius so it
 // doesn't crowd the continent lines, which now sit at a fixed angle/position
@@ -68,6 +69,9 @@ export default function PortraitMark({ record, x = 0, y = 0, r, onClick, onHover
 
       <TrendArc direction={aiFuture.direction} r={r} />
       <DiningDots count={diningHall.dots} r={r} />
+
+      {/* handwritten initials, drawn last so they stay legible over everything else */}
+      <InitialsMonogram initials={getInitials(record.name)} r={r} id={record.id} />
     </g>
   );
 }

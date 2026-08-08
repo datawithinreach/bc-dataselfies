@@ -193,6 +193,37 @@ export function moonPathD(size: number): string {
   return `${circle(0, R)} ${circle(dx, r2)}`;
 }
 
+/**
+ * Handwritten initials curving along the bottom of the circle, inset from
+ * the rim so they always stay inside the boundary — the arc's own path
+ * length caps how much text can fit, so it can never spill past the edge
+ * regardless of how long the initials are. `id` must be unique per portrait
+ * (multiple nodes share one <svg>, and the arc needs a unique element id
+ * for <textPath> to reference).
+ */
+export function InitialsMonogram({ initials, r, id }: { initials: string; r: number; id: string }) {
+  if (!initials) return null;
+  const arcR = r * 0.86;
+  const startAngle = (160 * Math.PI) / 180;
+  const endAngle = (20 * Math.PI) / 180;
+  const startX = arcR * Math.cos(startAngle);
+  const startY = arcR * Math.sin(startAngle);
+  const endX = arcR * Math.cos(endAngle);
+  const endY = arcR * Math.sin(endAngle);
+  const pathId = `initials-arc-${id}`;
+
+  return (
+    <>
+      <path id={pathId} d={`M ${startX} ${startY} A ${arcR} ${arcR} 0 0 0 ${endX} ${endY}`} fill="none" stroke="none" />
+      <text fontFamily="'Caveat', cursive" fontWeight={700} fontSize={r * 0.36} fill="#1a1a1a">
+        <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
+          {initials}
+        </textPath>
+      </text>
+    </>
+  );
+}
+
 /** A small cluster of dots inset in the circle, one per dining hall (count-coded, not color-coded). */
 export function DiningDots({ count, r }: { count: number; r: number }) {
   const dotR = Math.max(1.2, r * 0.07);
