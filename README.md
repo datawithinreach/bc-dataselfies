@@ -104,6 +104,21 @@ risk of two different visitors on two different devices accidentally hitting
 the *same* public URL and writing to two different `localStorage`s that never
 sync with each other or with your kiosk laptop.
 
+## Printing for button pins
+
+The thank-you screen has a "Print for a button pin" button that opens the
+browser's print dialog against a dedicated print layout — just the portrait,
+sized in real physical inches (`src/components/PrintButton.tsx`), not the
+rest of the page. Defaults to a 3" bleed circle with a faint dashed cut-line
+guide at 2.25", the standard convention for a 2.25" pin-back button. If
+you're using a different button size, change `BLEED_IN`/`BUTTON_IN` there.
+
+**Before the event**, print one test button and check the browser's print
+dialog has **scale set to 100%** ("Fit to page"/"Shrink to fit" will make it
+print smaller than 3" and throw off the button machine) and **margins set to
+None**. That's a one-time setting per browser/printer, not something visitors
+need to touch each time.
+
 ## Customizing
 
 - **Questions / options / colors** — all in `shared/questions.ts` and

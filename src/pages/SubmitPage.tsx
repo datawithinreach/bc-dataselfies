@@ -11,6 +11,7 @@ import {
   diningHallOptions,
 } from "../../shared/questions";
 import PortraitMark from "../components/PortraitMark";
+import PrintButton from "../components/PrintButton";
 import { addResponse } from "../lib/storage";
 
 type Draft = Partial<ResponseInput>;
@@ -118,9 +119,12 @@ export default function SubmitPage() {
           </svg>
           <h1>Thanks, {submitted.name.split(" ")[0]}!</h1>
           <p>Your data selfie just joined the wall — look for it on the big screen.</p>
-          <button className="primary" onClick={startOver}>
-            Make another
-          </button>
+          <div className="thankyou-actions">
+            <button className="primary" onClick={startOver}>
+              Make another
+            </button>
+            <PrintButton record={submitted} />
+          </div>
         </div>
       </div>
     );

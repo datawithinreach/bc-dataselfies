@@ -201,6 +201,57 @@ body {
   margin-bottom: 24px;
 }
 
+.thankyou-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.secondary {
+  background: none;
+  border: 1px solid var(--gold);
+  color: var(--maroon);
+  padding: 10px 20px;
+  font-size: 14px;
+  font-family: system-ui, sans-serif;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.secondary:hover {
+  background: #fbf3e6;
+}
+
+/* Only ever shown to the print stylesheet below — invisible on screen. */
+.print-sheet {
+  display: none;
+}
+
+@media print {
+  /* .print-sheet is portaled to a direct sibling of .page, not nested inside
+     it, specifically so this can just hide the whole page outright instead
+     of relying on visibility (which leaves layout height behind and can
+     paginate a spurious blank second page). */
+  .page {
+    display: none;
+  }
+  .print-sheet {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 3in;
+    height: 3in;
+    margin: 0;
+  }
+  @page {
+    margin: 0;
+    size: auto;
+  }
+}
+
 /* ---------- Display page ---------- */
 
 .display-page {
