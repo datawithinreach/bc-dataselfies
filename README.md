@@ -12,8 +12,11 @@ Inspired by Giorgia Lupi's [Data Selfies at TED
 ## How it's built
 
 - One static app, two routes, **no server, no internet, no database**:
-  - `/submit` — the questionnaire (laptop)
-  - `/display` — the live wall + legend (monitor)
+  - `#/submit` — the questionnaire (laptop)
+  - `#/display` — the live wall + legend (monitor)
+  - It uses hash-based routing (`HashRouter`) specifically so the app can be
+    served as plain static files — including from GitHub Pages, which has no
+    server-side rewrite for client-side routes.
 - Responses are stored in the browser's `localStorage`. `/submit` and
   `/display` are just two windows of the *same browser*, so they share that
   storage automatically, and a `BroadcastChannel` tells the other window the
@@ -27,7 +30,7 @@ Inspired by Giorgia Lupi's [Data Selfies at TED
   [`shared/palette.ts`](shared/palette.ts) — edit those to change the
   questions or BC brand colors without touching any component code.
 
-## Running it
+## Running it locally
 
 ```bash
 npm install
@@ -36,8 +39,8 @@ npm run dev
 
 Open in your browser:
 
-- `http://localhost:5173/submit` on the laptop
-- `http://localhost:5173/display` in a second window/tab (full-screen it on
+- `http://localhost:5173/#/submit` on the laptop
+- `http://localhost:5173/#/display` in a second window/tab (full-screen it on
   the monitor, e.g. `F11`)
 
 Because it's a static site, this works with zero network access beyond
@@ -61,12 +64,45 @@ BroadcastChannel sync between the two windows. Always serve it over
 
 - [ ] `npm run build && npm run preview` on the laptop that will drive both
       screens.
-- [ ] Open `http://localhost:4173/submit` in one window.
-- [ ] Open `http://localhost:4173/display` in a second window **of the same
+- [ ] Open `http://localhost:4173/#/submit` in one window.
+- [ ] Open `http://localhost:4173/#/display` in a second window **of the same
       browser**, drag it to the external monitor, and full-screen it.
 - [ ] Submit a couple of test entries to confirm the wall updates live, then
       click the small "Reset wall" link in the bottom-left corner of
       `/display` to clear it before real visitors start.
+
+## Deploying to GitHub Pages
+
+The repo builds and deploys automatically via
+[`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml) on
+every push to `main` or `claude/open-house-data-viz-5yyskl`. Two **one-time**
+manual steps are required first (GitHub doesn't expose these over the API,
+so they have to be done in the web UI by someone with admin access):
+
+1. **Make the repo public.** GitHub Pages isn't available for private repos
+   on the free plan. Settings → General → Danger Zone → "Change repository
+   visibility" → Public. (Nothing sensitive lives in the repo — visitor
+   responses stay in each browser's `localStorage` and are never committed —
+   so this just makes the source code and question copy publicly readable.)
+2. **Turn on Pages.** Settings → Pages → Build and deployment → Source:
+   "GitHub Actions". Save.
+
+After that, any push to a tracked branch redeploys automatically (check
+progress under the repo's Actions tab). The live site will be at:
+
+```
+https://datawithinreach.github.io/bc-dataselfies/
+```
+
+which redirects to `#/submit`; the display wall is at
+`https://datawithinreach.github.io/bc-dataselfies/#/display`.
+
+Note that a deployment there is only really useful for **testing/demoing
+remotely** — for the actual open house, running it locally (above) is more
+reliable: no dependency on venue WiFi reaching GitHub, no cold start, and no
+risk of two different visitors on two different devices accidentally hitting
+the *same* public URL and writing to two different `localStorage`s that never
+sync with each other or with your kiosk laptop.
 
 ## Customizing
 
