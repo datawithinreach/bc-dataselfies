@@ -218,6 +218,26 @@ body {
   background: radial-gradient(circle at 30% 20%, #faf7f0 0%, var(--bg) 60%);
 }
 
+.node-tooltip {
+  position: absolute;
+  transform: translate(-50%, calc(-100% - 10px));
+  background: var(--ink);
+  color: #fff;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  white-space: pre-line;
+  padding: 8px 10px;
+  border-radius: 6px;
+  max-width: 220px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
+  /* Never let the tooltip itself receive mouse events — it sits right where
+     the node/cursor is, so without this it would steal the hover from the
+     node underneath and immediately trigger a mouseleave, flickering. */
+  pointer-events: none;
+  z-index: 5;
+}
+
 .reset-btn {
   position: absolute;
   bottom: 12px;

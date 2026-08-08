@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { describeResponse } from "../../shared/questions";
 import { useResponses } from "../lib/useResponses";
 import { useForceLayout } from "../lib/useForceLayout";
 import { resetResponses } from "../lib/storage";
@@ -43,15 +44,33 @@ export default function DisplayPage() {
   const { records } = useResponses();
   const [canvasRef, { width, height }] = useElementSize<HTMLDivElement>();
   const nodes = useForceLayout(records, width, height);
+  const [hoveredId, setHoveredId] = useState<string | null>(null);
+
+  const hoveredNode = hoveredId ? nodes.find((n) => n.id === hoveredId) : undefined;
 
   return (
     <div className="page display-page">
       <div className="canvas" ref={canvasRef}>
         <svg width={width} height={height}>
           {nodes.map((n) => (
-            <PortraitMark key={n.id} record={n.record} x={n.x ?? 0} y={n.y ?? 0} r={n.r} />
+            <PortraitMark
+              key={n.id}
+              record={n.record}
+              x={n.x ?? 0}
+              y={n.y ?? 0}
+              r={n.r}
+              onHoverChange={(hovering) => setHoveredId(hovering ? n.id : null)}
+            />
           ))}
         </svg>
+        {hoveredNode && (
+          <div
+            className="node-tooltip"
+            style={{ left: hoveredNode.x ?? 0, top: (hoveredNode.y ?? 0) - hoveredNode.r }}
+          >
+            {describeResponse(hoveredNode.record)}
+          </div>
+        )}
         {records.length === 0 && (
           <div className="empty-state">
             <p>No portraits yet — visit the laptop to submit yours!</p>

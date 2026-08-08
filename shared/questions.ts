@@ -115,6 +115,27 @@ export function findOption<T extends Option>(options: T[], value: string): T {
   return found;
 }
 
+/**
+ * Human-readable summary of a response's answers, for the hover tooltip on
+ * /display. Deliberately leaves the name out — it's collected but never
+ * shown anywhere on that page.
+ */
+export function describeResponse(record: ResponseRecord): string {
+  const affiliation = findOption(affiliationOptions, record.affiliation);
+  const school = findOption(schoolOptions, record.school);
+  const continent = findOption(continentOptions, record.continent);
+  const chronotype = findOption(chronotypeOptions, record.chronotype);
+  const rules = findOption(rulesOptions, record.rules);
+  const aiFuture = findOption(aiFutureOptions, record.aiFuture);
+  const diningHall = findOption(diningHallOptions, record.diningHall);
+  return [
+    `${affiliation.label} — ${school.label}`,
+    `${continent.label} · ${chronotype.label}`,
+    `Rules: ${rules.label} · AI's future: ${aiFuture.label}`,
+    `Dining hall: ${diningHall.label}`,
+  ].join("\n");
+}
+
 const VALID_VALUES: Record<Exclude<keyof ResponseInput, "name">, Set<string>> = {
   affiliation: new Set(affiliationOptions.map((o) => o.value)),
   school: new Set(schoolOptions.map((o) => o.value)),
