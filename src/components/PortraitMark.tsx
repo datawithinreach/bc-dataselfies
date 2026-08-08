@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import type { ResponseRecord } from "../../shared/questions";
 import {
   affiliationOptions,
@@ -32,7 +31,12 @@ export interface PortraitMarkProps {
 }
 
 export default function PortraitMark({ record, x = 0, y = 0, r, onClick }: PortraitMarkProps) {
-  const rng = useMemo(() => makeRng(record.id), [record.id]);
+  // Not memoized on purpose: makeRng() is pure, so a fresh generator seeded
+  // from the same id always replays the same sequence of values. Reusing one
+  // generator instance across re-renders (e.g. via useMemo) would let each
+  // force-simulation tick advance it further, making the shape's jitter
+  // silently change every frame instead of staying fixed per person.
+  const rng = makeRng(record.id);
 
   const affiliation = findOption(affiliationOptions, record.affiliation);
   const school = findOption(schoolOptions, record.school);
