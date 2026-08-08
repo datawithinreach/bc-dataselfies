@@ -138,10 +138,16 @@ export function TrendArc({ direction, r }: { direction: ArcDirection; r: number 
   );
 }
 
+// Shared look for both chronotype icons — a muted gray rather than solid
+// black ink, so they read as a softer accent instead of competing with the
+// bolder black shape/lines/dot marks.
+export const CHRONOTYPE_COLOR = "#6b6b6b";
+export const CHRONOTYPE_OPACITY = 0.65;
+
 /**
  * Early bird / night owl, drawn using the portrait's own main circle rather
  * than a separate small icon: a ring of rays inset just inside the rim for
- * "sun", or a bold crescent inset within the circle for "moon".
+ * "sun", or a crescent inset within the circle for "moon".
  */
 export function ChronotypeMark({ icon, r }: { icon: ChronotypeIcon; r: number }) {
   if (icon === "sun") {
@@ -160,7 +166,7 @@ export function ChronotypeMark({ icon, r }: { icon: ChronotypeIcon; r: number })
       );
     });
     return (
-      <g stroke="#1a1a1a" strokeWidth={sw} strokeLinecap="round">
+      <g stroke={CHRONOTYPE_COLOR} strokeOpacity={CHRONOTYPE_OPACITY} strokeWidth={sw} strokeLinecap="round">
         {rays}
       </g>
     );
@@ -168,7 +174,7 @@ export function ChronotypeMark({ icon, r }: { icon: ChronotypeIcon; r: number })
 
   // Outer edge exactly r so it coincides with the portrait's own circle
   // boundary instead of floating as a visibly smaller, separate disc.
-  return <path d={moonPathD(r)} fill="#003957" fillOpacity={0.9} fillRule="evenodd" />;
+  return <path d={moonPathD(r)} fill={CHRONOTYPE_COLOR} fillOpacity={CHRONOTYPE_OPACITY} fillRule="evenodd" />;
 }
 
 /**

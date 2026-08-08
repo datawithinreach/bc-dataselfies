@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { ArcDirection, ChronotypeIcon } from "../../shared/questions";
-import { moonPathD } from "../lib/marks";
+import { moonPathD, CHRONOTYPE_COLOR, CHRONOTYPE_OPACITY } from "../lib/marks";
 
 // Mini renders of each visual channel, built at a legible scale of their own —
 // so the legend shows what the channel really looks like on a portrait,
@@ -96,7 +96,7 @@ export function ChronotypeIconPreview({ icon }: { icon: ChronotypeIcon }) {
     return (
       <PreviewFrame>
         <BaseCircle />
-        <g stroke="#1a1a1a" strokeWidth={1.8} strokeLinecap="round">
+        <g stroke={CHRONOTYPE_COLOR} strokeOpacity={CHRONOTYPE_OPACITY} strokeWidth={1.8} strokeLinecap="round">
           {rays}
         </g>
       </PreviewFrame>
@@ -106,7 +106,7 @@ export function ChronotypeIconPreview({ icon }: { icon: ChronotypeIcon }) {
   return (
     <PreviewFrame>
       <BaseCircle />
-      <path d={moonPathD(R)} fill="#003957" fillOpacity={0.9} fillRule="evenodd" />
+      <path d={moonPathD(R)} fill={CHRONOTYPE_COLOR} fillOpacity={CHRONOTYPE_OPACITY} fillRule="evenodd" />
     </PreviewFrame>
   );
 }
