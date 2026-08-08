@@ -108,16 +108,19 @@ sync with each other or with your kiosk laptop.
 
 The thank-you screen has a "Print for a button pin" button that opens the
 browser's print dialog against a dedicated print layout — just the portrait,
-sized in real physical inches (`src/components/PrintButton.tsx`), not the
-rest of the page. Defaults to a 3" bleed circle with a faint dashed cut-line
-guide at 2.25", the standard convention for a 2.25" pin-back button. If
-you're using a different button size, change `BLEED_IN`/`BUTTON_IN` there.
+sized in real physical inches (`src/components/PrintButton.tsx`), centered
+on whatever paper size the print dialog actually uses (Letter, A4, whatever
+the printer has loaded — it deliberately doesn't try to force a custom small
+page size, since browsers don't honor that reliably). Defaults to a 3"
+bleed circle with a faint dashed cut-line guide at 2.25", the standard
+convention for a 2.25" pin-back button. If you're using a different button
+size, change `BLEED_IN`/`BUTTON_IN` there.
 
 **Before the event**, print one test button and check the browser's print
-dialog has **scale set to 100%** ("Fit to page"/"Shrink to fit" will make it
-print smaller than 3" and throw off the button machine) and **margins set to
-None**. That's a one-time setting per browser/printer, not something visitors
-need to touch each time.
+dialog has **scale set to 100%** — "Fit to page"/"Shrink to fit" will print
+the design smaller than the real 3", throwing off the button machine. That's
+a one-time setting per browser/printer, not something visitors need to touch
+each time.
 
 ## Customizing
 

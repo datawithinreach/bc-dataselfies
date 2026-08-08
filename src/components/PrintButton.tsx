@@ -17,16 +17,24 @@ export default function PrintButton({ record }: { record: ResponseRecord }) {
       </button>
 
       {/* Portaled straight to <body>, as a sibling of the page rather than nested
-          inside it — @media print hides `.page` entirely (display: none) and shows
-          only this. Nesting it inside `.page` instead (hidden via visibility, not
-          display) was tried first and produced a spurious blank second page: the
-          on-screen thank-you card's min-height:100vh layout still occupied page
-          flow space even while invisible, and Chromium paginated for it. Tight
-          viewBox (matching the portrait's own radius exactly) so the design bleeds
-          to the full edge of the print area, the way a real button template expects. */}
+          inside it — @media print hides `.page` entirely (display: none) and
+          centers this within whatever paper size the print dialog actually uses
+          (see the .print-sheet rules in styles.css; it deliberately does not try
+          to force a custom small @page size — browsers don't honor that reliably
+          and it ends up pinning the design in a page corner instead of centering
+          it). Nesting it inside `.page` instead of portaling (hidden via
+          visibility, not display) was tried first and produced a spurious blank
+          second page: the on-screen thank-you card's min-height:100vh layout
+          still occupied page-flow height even while invisible, and Chromium
+          paginated for it. */}
       {createPortal(
         <div className="print-sheet" aria-hidden="true">
-          <svg viewBox={`${-R} ${-R} ${R * 2} ${R * 2}`} width="100%" height="100%">
+          {/* Fixed physical size (not 100%) so it prints at exactly BLEED_IN
+              regardless of the page it ends up centered on. Tight viewBox
+              (matching the portrait's own radius exactly) so the design bleeds
+              to the full edge of this circle, the way a real button template
+              expects. */}
+          <svg viewBox={`${-R} ${-R} ${R * 2} ${R * 2}`} width={`${BLEED_IN}in`} height={`${BLEED_IN}in`}>
             <PortraitMark record={record} r={R} />
             {/* Faint cut-line guide at the button's visible face (2.25"), inset from
                 the 3" bleed edge — helpful whether you're using a machine's punch or

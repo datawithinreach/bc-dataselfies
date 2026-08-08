@@ -208,6 +208,13 @@ body {
   gap: 10px;
 }
 
+.thankyou-actions .primary {
+  /* .primary defaults to align-self: flex-start for its usual home in the
+     submit form (left-aligned under the form fields) — override that here
+     so it centers like its sibling instead of hugging the left edge. */
+  align-self: center;
+}
+
 .secondary {
   background: none;
   border: 1px solid var(--gold);
@@ -238,17 +245,25 @@ body {
     display: none;
   }
   .print-sheet {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Fills whatever paper size the print dialog actually ends up using
+       (Letter, A4, whatever's loaded) and centers the design in the middle
+       of it — trying to force a custom small @page size instead (an earlier
+       version of this set `size: auto` and sized .print-sheet itself to
+       ~3.5in) doesn't work reliably: browsers fall back to the printer's
+       real paper size regardless, and a fixed-position element sized for a
+       *different*, smaller page just ends up pinned in the corner of the
+       actual sheet instead of centered on it. */
     position: fixed;
-    top: 0;
-    left: 0;
-    width: 3in;
-    height: 3in;
+    inset: 0;
     margin: 0;
   }
+  /* No forced @page size — let the print dialog's own paper-size selection
+     (Letter/A4/whatever) stand; .print-sheet above centers within it. */
   @page {
     margin: 0;
-    size: auto;
   }
 }
 
