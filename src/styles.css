@@ -144,14 +144,6 @@ body {
   accent-color: var(--maroon);
 }
 
-.swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 3px;
-  flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
 .primary {
   align-self: flex-start;
   background: var(--maroon);
@@ -294,22 +286,11 @@ body {
 .legend-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   font-size: 13px;
-  padding: 3px 0;
+  padding: 1px 0;
 }
 
-.legend-swatch {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  flex-shrink: 0;
-  border: 1px solid rgba(0, 0, 0, 0.15);
-}
-
-.legend-glyph {
-  width: 26px;
-  text-align: center;
-  font-size: 15px;
+.legend-row svg {
   flex-shrink: 0;
 }

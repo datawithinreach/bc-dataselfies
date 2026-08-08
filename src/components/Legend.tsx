@@ -10,17 +10,22 @@ import {
   aiFutureOptions,
 } from "../../shared/questions";
 import { AffiliationMark } from "../lib/marks";
+import {
+  SchoolPreview,
+  ContinentPreview,
+  BestIdeasPreview,
+  RulesPreview,
+  ChronotypePreview,
+  AiFuturePreview,
+  AnxietyPreview,
+} from "./LegendPreview";
 
 function MiniShape({ shape }: { shape: (typeof affiliationOptions)[number]["shape"] }) {
   return (
-    <svg width={26} height={26} viewBox="-15 -15 30 30">
-      <AffiliationMark shape={shape} r={11} rng={() => 0.5} />
+    <svg width={38} height={38} viewBox="-19 -19 38 38">
+      <AffiliationMark shape={shape} r={13} rng={() => 0.5} />
     </svg>
   );
-}
-
-function Swatch({ color }: { color: string }) {
-  return <span className="legend-swatch" style={{ background: color }} />;
 }
 
 function LegendGroup({ title, children }: { title: string; children: ReactNode }) {
@@ -52,7 +57,7 @@ export default function Legend({ count }: { count: number }) {
       <LegendGroup title="Background wash — school / dept.">
         {schoolOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <Swatch color={o.color} />
+            <SchoolPreview color={o.color} />
             <span>{o.label}</span>
           </div>
         ))}
@@ -61,7 +66,7 @@ export default function Legend({ count }: { count: number }) {
       <LegendGroup title="Parallel lines — continent">
         {continentOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <Swatch color={o.color} />
+            <ContinentPreview color={o.color} />
             <span>{o.label}</span>
           </div>
         ))}
@@ -70,7 +75,7 @@ export default function Legend({ count }: { count: number }) {
       <LegendGroup title="Dot — best ideas strike...">
         {bestIdeasOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <Swatch color={o.color} />
+            <BestIdeasPreview color={o.color} />
             <span>{o.label}</span>
           </div>
         ))}
@@ -79,7 +84,7 @@ export default function Legend({ count }: { count: number }) {
       <LegendGroup title="Bottom fill — the rules">
         {rulesOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <Swatch color={o.color} />
+            <RulesPreview color={o.color} />
             <span>{o.label}</span>
           </div>
         ))}
@@ -88,7 +93,7 @@ export default function Legend({ count }: { count: number }) {
       <LegendGroup title="Arc, top — chronotype">
         {chronotypeOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <span className="legend-glyph">{o.direction === "up" ? "⌢" : "⌣"}</span>
+            <ChronotypePreview direction={o.direction} />
             <span>{o.label}</span>
           </div>
         ))}
@@ -97,7 +102,7 @@ export default function Legend({ count }: { count: number }) {
       <LegendGroup title="Tick, bottom-right — AI's future">
         {aiFutureOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <span className="legend-glyph">{o.direction === "up" ? "↗" : "↘"}</span>
+            <AiFuturePreview direction={o.direction} />
             <span>{o.label}</span>
           </div>
         ))}
@@ -106,7 +111,7 @@ export default function Legend({ count }: { count: number }) {
       <LegendGroup title="Dots, right — unread-email anxiety">
         {emailAnxietyOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <span className="legend-glyph">{"•".repeat(o.dots)}</span>
+            <AnxietyPreview count={o.dots} />
             <span>{o.label}</span>
           </div>
         ))}

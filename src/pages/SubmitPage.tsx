@@ -16,7 +16,7 @@ type Draft = Partial<ResponseInput>;
 
 const EMPTY: Draft = {};
 
-interface RadioQuestionProps<T extends { value: string; label: string; color?: string }> {
+interface RadioQuestionProps<T extends { value: string; label: string }> {
   title: string;
   field: keyof ResponseInput;
   options: T[];
@@ -24,7 +24,7 @@ interface RadioQuestionProps<T extends { value: string; label: string; color?: s
   onChange: (field: keyof ResponseInput, value: string) => void;
 }
 
-function RadioQuestion<T extends { value: string; label: string; color?: string }>({
+function RadioQuestion<T extends { value: string; label: string }>({
   title,
   field,
   options,
@@ -44,7 +44,6 @@ function RadioQuestion<T extends { value: string; label: string; color?: string 
               checked={draft[field] === opt.value}
               onChange={() => onChange(field, opt.value)}
             />
-            {opt.color && <span className="swatch" style={{ background: opt.color }} />}
             <span>{opt.label}</span>
           </label>
         ))}
