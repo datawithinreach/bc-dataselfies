@@ -112,7 +112,10 @@ export default function SubmitPage() {
     return (
       <div className="page submit-page thankyou">
         <div className="thankyou-card">
-          <svg viewBox="-100 -100 200 200" width={220} height={220}>
+          {/* Several marks (chronotype arc, AI-future tick, anxiety dots) are drawn
+              outside the main circle on purpose, up to ~1.4x the radius — this
+              viewBox needs real padding or they get cropped. */}
+          <svg viewBox="-135 -135 270 270" width={240} height={240}>
             <PortraitMark record={submitted} r={90} />
           </svg>
           <h1>Thanks, {submitted.name.split(" ")[0]}!</h1>
