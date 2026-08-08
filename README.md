@@ -111,15 +111,20 @@ browser's print dialog against a dedicated print layout — just the portrait,
 sized in real physical inches (`src/components/PrintButton.tsx`), centered
 on whatever paper size the print dialog actually uses (Letter, A4, whatever
 the printer has loaded — it deliberately doesn't try to force a custom small
-page size, since browsers don't honor that reliably). Defaults to a 3"
-bleed circle with a faint dashed cut-line guide at 2.25", the standard
-convention for a 2.25" pin-back button. If you're using a different button
-size, change `BLEED_IN`/`BUTTON_IN` there.
+page size, since browsers don't honor that reliably).
+
+Sized for the clear snap-together button badges (3" outer shell, 2.68"
+inner opening the paper insert has to clear) — prints the portrait at 2.5",
+comfortably under that opening rather than right up against it. If you're
+using a different button product, change `DESIGN_IN` there — for a crimped
+metal pin-back button instead (where the design bleeds to the edge and a
+ring around it folds under the backing), you'd want it sized *larger* than
+the visible face rather than smaller.
 
 **Before the event**, print one test button and check the browser's print
 dialog has **scale set to 100%** — "Fit to page"/"Shrink to fit" will print
-the design smaller than the real 3", throwing off the button machine. That's
-a one-time setting per browser/printer, not something visitors need to touch
+the design smaller than the real 2.5", risking too loose a fit. That's a
+one-time setting per browser/printer, not something visitors need to touch
 each time.
 
 ## Customizing
