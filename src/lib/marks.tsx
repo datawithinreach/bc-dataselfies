@@ -215,7 +215,7 @@ export function InitialsMonogram({ initials, r, id }: { initials: string; r: num
   return (
     <>
       <path id={pathId} d={`M ${startX} ${startY} A ${arcR} ${arcR} 0 0 0 ${endX} ${endY}`} fill="none" stroke="none" />
-      <text fontFamily="'Caveat', cursive" fontWeight={700} fontSize={r * 0.36} fill="#1a1a1a">
+      <text fontFamily="'Caveat', cursive" fontWeight={700} fontSize={r * 0.3} fill="#1a1a1a">
         <textPath href={`#${pathId}`} startOffset="50%" textAnchor="middle">
           {initials}
         </textPath>
@@ -229,7 +229,7 @@ export function DiningDots({ count, r }: { count: number; r: number }) {
   const dotR = Math.max(1.2, r * 0.07);
   const spacing = r * 0.19;
   const cols = 3;
-  const cx = r * 0.32;
+  const cx = r * 0.38;
   const cy = r * 0.42;
   return (
     <g fill="#1a1a1a">
