@@ -4,14 +4,13 @@ import {
   schoolOptions,
   continentOptions,
   chronotypeOptions,
-  bestIdeasOptions,
   rulesOptions,
-  emailAnxietyOptions,
   aiFutureOptions,
+  diningHallOptions,
   findOption,
 } from "../../shared/questions";
 import { makeRng } from "../lib/hash";
-import { AffiliationMark, ContinentLines, ChronotypeArc, AiFutureTick, AnxietyDots } from "../lib/marks";
+import { AffiliationMark, ContinentLines, TrendArc, ChronotypeMark, DiningStamp } from "../lib/marks";
 
 const CONTINENT_ANGLES: Record<string, number> = {
   na: -20,
@@ -42,34 +41,29 @@ export default function PortraitMark({ record, x = 0, y = 0, r, onClick }: Portr
   const school = findOption(schoolOptions, record.school);
   const continent = findOption(continentOptions, record.continent);
   const chronotype = findOption(chronotypeOptions, record.chronotype);
-  const bestIdeas = findOption(bestIdeasOptions, record.bestIdeas);
   const rules = findOption(rulesOptions, record.rules);
-  const anxiety = findOption(emailAnxietyOptions, record.emailAnxiety);
   const aiFuture = findOption(aiFutureOptions, record.aiFuture);
+  const diningHall = findOption(diningHallOptions, record.diningHall);
 
   const angle = CONTINENT_ANGLES[continent.value] ?? 0;
 
   return (
     <g transform={`translate(${x} ${y})`} onClick={onClick} style={{ cursor: onClick ? "pointer" : undefined }}>
-      {/* school wash */}
-      <circle r={r} fill={school.color} opacity={0.22} />
-      {/* rules half-fill, bottom half */}
-      <path
-        d={`M ${-r} 0 A ${r} ${r} 0 0 0 ${r} 0 Z`}
-        fill={rules.color}
-        opacity={0.4}
-      />
-      <circle r={r} fill="none" stroke={school.color} strokeOpacity={0.7} strokeWidth={Math.max(1, r * 0.035)} />
+      {/* neutral base */}
+      <circle r={r} fill="#e6e0d2" />
+      {/* school / dept, bottom half-fill */}
+      <path d={`M ${-r} 0 A ${r} ${r} 0 0 0 ${r} 0 Z`} fill={school.color} opacity={0.6} />
+      <circle r={r} fill="none" stroke="#c9bfa8" strokeWidth={Math.max(1, r * 0.035)} />
 
       <ContinentLines color={continent.color} r={r} angle={angle} />
       <AffiliationMark shape={affiliation.shape} r={r} rng={rng} />
 
-      {/* best-ideas dot */}
-      <circle cx={-r * 0.62} cy={-r * 0.5} r={Math.max(2, r * 0.16)} fill={bestIdeas.color} />
+      {/* rules, single colored dot */}
+      <circle cx={-r * 0.62} cy={-r * 0.5} r={Math.max(2, r * 0.16)} fill={rules.color} />
 
-      <ChronotypeArc direction={chronotype.direction} r={r} />
-      <AiFutureTick direction={aiFuture.direction} r={r} />
-      <AnxietyDots count={anxiety.dots} r={r} />
+      <ChronotypeMark icon={chronotype.icon} r={r} />
+      <TrendArc direction={aiFuture.direction} r={r} />
+      <DiningStamp color={diningHall.color} r={r} />
     </g>
   );
 }

@@ -4,14 +4,13 @@ import { palette } from "./palette";
 // Loosely modeled on Giorgia Lupi's TED "Data Selfies" (2017): every answer
 // maps to one distinct visual channel on a person's circular "portrait" mark.
 // Channel -> question:
-//   base shape (black ink)      -> affiliation
-//   background color wash       -> school / department
-//   two colored parallel lines  -> continent
-//   small black arc, top        -> early bird / night owl
-//   single colored dot          -> when you get best ideas
-//   colored half-circle fill    -> rules: follow / fudge / ignore
-//   row of black dots           -> unread-email anxiety threshold
-//   small tick mark, bottom     -> AI's future: bright / grim
+//   base shape (black ink)         -> affiliation
+//   colored bottom half-fill       -> school / department
+//   two colored parallel lines     -> continent
+//   sun / moon icon, top           -> early bird / night owl
+//   colored arc, top               -> AI's future: bright / grim
+//   single colored dot             -> rules: follow / fudge / ignore
+//   colored diamond stamp, bottom  -> favorite dining hall
 
 export interface Option<Extra extends Record<string, unknown> = Record<string, never>> {
   value: string;
@@ -32,8 +31,9 @@ export interface ArcOption extends Option {
   direction: ArcDirection;
 }
 
-export interface DotCountOption extends Option {
-  dots: number;
+export type ChronotypeIcon = "sun" | "moon";
+export interface ChronotypeOption extends Option {
+  icon: ChronotypeIcon;
 }
 
 export const affiliationOptions: AffiliationOption[] = [
@@ -63,18 +63,9 @@ export const continentOptions: ColorOption[] = [
   { value: "oc", label: "Oceania", color: palette.lightSlateBlue },
 ];
 
-export const chronotypeOptions: ArcOption[] = [
-  { value: "early_bird", label: "Early bird", direction: "up" },
-  { value: "night_owl", label: "Night owl", direction: "down" },
-];
-
-export const bestIdeasOptions: ColorOption[] = [
-  { value: "falling_asleep", label: "Right before I fall asleep / wake up", color: palette.red },
-  { value: "getting_ready", label: "While I'm getting ready", color: palette.darkMaroon },
-  { value: "commute", label: "During my commute", color: palette.burntOrange },
-  { value: "office", label: "At the office / lab", color: palette.darkSlateBlue },
-  { value: "beverage", label: "After an adult beverage", color: palette.yellowGold },
-  { value: "anytime", label: "I never know when brilliance might strike", color: palette.darkBlue },
+export const chronotypeOptions: ChronotypeOption[] = [
+  { value: "early_bird", label: "Early bird", icon: "sun" },
+  { value: "night_owl", label: "Night owl", icon: "moon" },
 ];
 
 export const rulesOptions: ColorOption[] = [
@@ -83,16 +74,18 @@ export const rulesOptions: ColorOption[] = [
   { value: "ignore", label: "Ignore them", color: palette.red },
 ];
 
-export const emailAnxietyOptions: DotCountOption[] = [
-  { value: "1", label: "1", dots: 1 },
-  { value: "20", label: "20", dots: 2 },
-  { value: "100", label: "Over 100", dots: 3 },
-  { value: "1000s", label: "I don't get anxious until the 1000s", dots: 4 },
-];
-
 export const aiFutureOptions: ArcOption[] = [
   { value: "bright", label: "Bright", direction: "up" },
   { value: "grim", label: "Grim", direction: "down" },
+];
+
+export const diningHallOptions: ColorOption[] = [
+  { value: "hillside", label: "Hillside Cafe", color: palette.gold },
+  { value: "lower_live", label: "Lower Live", color: palette.darkBlue },
+  { value: "tully", label: "Tully Cafe", color: palette.burntOrange },
+  { value: "eagles_nest", label: "Eagle's Nest", color: palette.maroon },
+  { value: "carney", label: "Carney Dining Room", color: palette.darkSlateBlue },
+  { value: "coro", label: "CoRo Cafe", color: palette.yellowGold },
 ];
 
 export interface ResponseInput {
@@ -101,10 +94,9 @@ export interface ResponseInput {
   school: string;
   continent: string;
   chronotype: string;
-  bestIdeas: string;
   rules: string;
-  emailAnxiety: string;
   aiFuture: string;
+  diningHall: string;
 }
 
 export interface ResponseRecord extends ResponseInput {

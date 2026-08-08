@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import type { ArcDirection } from "../../shared/questions";
+import type { ArcDirection, ChronotypeIcon } from "../../shared/questions";
+import { moonPathD } from "../lib/marks";
 
 // Mini renders of each visual channel, built at a legible scale of their own —
 // so the legend shows what the channel really looks like on a portrait,
@@ -26,15 +27,6 @@ function BaseCircle() {
   return <circle r={R} fill={NEUTRAL_FILL} stroke={NEUTRAL_STROKE} strokeWidth={1} />;
 }
 
-export function SchoolPreview({ color }: { color: string }) {
-  return (
-    <PreviewFrame>
-      <circle r={R} fill={color} opacity={0.28} />
-      <circle r={R} fill="none" stroke={color} strokeOpacity={0.8} strokeWidth={1.4} />
-    </PreviewFrame>
-  );
-}
-
 export function ContinentPreview({ color }: { color: string }) {
   const len = R * 1.5;
   const gap = 6;
@@ -49,7 +41,8 @@ export function ContinentPreview({ color }: { color: string }) {
   );
 }
 
-export function BestIdeasPreview({ color }: { color: string }) {
+/** Single colored dot — used for the "rules" channel. */
+export function DotPreview({ color }: { color: string }) {
   return (
     <PreviewFrame>
       <BaseCircle />
@@ -58,7 +51,8 @@ export function BestIdeasPreview({ color }: { color: string }) {
   );
 }
 
-export function RulesPreview({ color }: { color: string }) {
+/** Colored bottom half-fill — used for the "school / dept." channel. */
+export function HalfFillPreview({ color }: { color: string }) {
   return (
     <PreviewFrame>
       <BaseCircle />
@@ -67,7 +61,8 @@ export function RulesPreview({ color }: { color: string }) {
   );
 }
 
-export function ChronotypePreview({ direction }: { direction: ArcDirection }) {
+/** Small curve, swoops up or down — used for "AI's future". */
+export function TrendArcPreview({ direction }: { direction: ArcDirection }) {
   const w = R * 0.85;
   const h = (direction === "up" ? -1 : 1) * R * 0.55;
   return (
@@ -78,35 +73,59 @@ export function ChronotypePreview({ direction }: { direction: ArcDirection }) {
   );
 }
 
-export function AiFuturePreview({ direction }: { direction: ArcDirection }) {
-  const dy = direction === "up" ? -R * 0.7 : R * 0.7;
+/** Sun or crescent moon icon — used for "early bird / night owl". */
+export function ChronotypeIconPreview({ icon }: { icon: ChronotypeIcon }) {
+  const size = R * 0.45;
+  const sw = 2.2;
+
+  if (icon === "sun") {
+    const rays = Array.from({ length: 8 }, (_, i) => {
+      const a = (Math.PI * 2 * i) / 8;
+      return (
+        <line
+          key={i}
+          x1={Math.cos(a) * size * 1.45}
+          y1={Math.sin(a) * size * 1.45}
+          x2={Math.cos(a) * size * 2.05}
+          y2={Math.sin(a) * size * 2.05}
+        />
+      );
+    });
+    return (
+      <PreviewFrame>
+        <BaseCircle />
+        <g stroke="#1a1a1a" strokeWidth={sw} strokeLinecap="round">
+          <circle r={size} fill="none" />
+          {rays}
+        </g>
+      </PreviewFrame>
+    );
+  }
+
   return (
     <PreviewFrame>
       <BaseCircle />
-      <g stroke="#1a1a1a" strokeWidth={2.4} strokeLinecap="round">
-        <line x1={-R * 0.4} y1={0} x2={R * 0.4} y2={dy} />
-        {direction === "up" && (
-          <>
-            <line x1={R * 0.4} y1={dy} x2={R * 0.62} y2={dy + 3} />
-            <line x1={R * 0.4} y1={dy} x2={R * 0.52} y2={dy + 9} />
-          </>
-        )}
-      </g>
+      <path d={moonPathD(size)} fill="#1a1a1a" fillRule="evenodd" />
     </PreviewFrame>
   );
 }
 
-export function AnxietyPreview({ count }: { count: number }) {
-  const spacing = 8;
-  const startX = (-(count - 1) * spacing) / 2;
+/** Colored diamond "stamp" — used for "favorite dining hall". */
+export function DiningStampPreview({ color }: { color: string }) {
+  const size = R * 0.7;
   return (
     <PreviewFrame>
       <BaseCircle />
-      <g fill="#1a1a1a">
-        {Array.from({ length: count }).map((_, i) => (
-          <circle key={i} cx={startX + i * spacing} cy={R * 0.7} r={2.6} />
-        ))}
-      </g>
+      <rect
+        x={-size / 2}
+        y={-size / 2}
+        width={size}
+        height={size}
+        fill={color}
+        stroke="#1a1a1a"
+        strokeWidth={1.4}
+        transform="rotate(45)"
+      />
     </PreviewFrame>
   );
 }

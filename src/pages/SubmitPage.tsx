@@ -6,10 +6,9 @@ import {
   schoolOptions,
   continentOptions,
   chronotypeOptions,
-  bestIdeasOptions,
   rulesOptions,
-  emailAnxietyOptions,
   aiFutureOptions,
+  diningHallOptions,
 } from "../../shared/questions";
 import PortraitMark from "../components/PortraitMark";
 import { addResponse } from "../lib/storage";
@@ -17,6 +16,17 @@ import { addResponse } from "../lib/storage";
 type Draft = Partial<ResponseInput>;
 
 const EMPTY: Draft = {};
+
+const REQUIRED_FIELDS: (keyof ResponseInput)[] = [
+  "name",
+  "affiliation",
+  "school",
+  "continent",
+  "chronotype",
+  "rules",
+  "aiFuture",
+  "diningHall",
+];
 
 interface RadioQuestionProps<T extends { value: string; label: string }> {
   title: string;
@@ -64,18 +74,7 @@ export default function SubmitPage() {
   };
 
   const requiredMissing = () => {
-    const fields: (keyof ResponseInput)[] = [
-      "name",
-      "affiliation",
-      "school",
-      "continent",
-      "chronotype",
-      "bestIdeas",
-      "rules",
-      "emailAnxiety",
-      "aiFuture",
-    ];
-    return fields.some((f) => !draft[f] || String(draft[f]).trim().length === 0);
+    return REQUIRED_FIELDS.some((f) => !draft[f] || String(draft[f]).trim().length === 0);
   };
 
   function handleSubmit(e: React.FormEvent) {
@@ -92,10 +91,9 @@ export default function SubmitPage() {
       school: draft.school!,
       continent: draft.continent!,
       chronotype: draft.chronotype!,
-      bestIdeas: draft.bestIdeas!,
       rules: draft.rules!,
-      emailAnxiety: draft.emailAnxiety!,
       aiFuture: draft.aiFuture!,
+      diningHall: draft.diningHall!,
       createdAt: Date.now(),
     };
     addResponse(record);
@@ -112,10 +110,10 @@ export default function SubmitPage() {
     return (
       <div className="page submit-page thankyou">
         <div className="thankyou-card">
-          {/* Several marks (chronotype arc, AI-future tick, anxiety dots) are drawn
-              outside the main circle on purpose, up to ~1.4x the radius — this
+          {/* Several marks (AI-future arc, chronotype icon, dining stamp) are drawn
+              outside the main circle on purpose, up to ~1.6x the radius — this
               viewBox needs real padding or they get cropped. */}
-          <svg viewBox="-135 -135 270 270" width={240} height={240}>
+          <svg viewBox="-155 -155 310 310" width={260} height={260}>
             <PortraitMark record={submitted} r={90} />
           </svg>
           <h1>Thanks, {submitted.name.split(" ")[0]}!</h1>
@@ -156,16 +154,9 @@ export default function SubmitPage() {
         <RadioQuestion title="Your school / department" field="school" options={schoolOptions} draft={draft} onChange={set} />
         <RadioQuestion title="What continent are you from?" field="continent" options={continentOptions} draft={draft} onChange={set} />
         <RadioQuestion title="Early bird or night owl?" field="chronotype" options={chronotypeOptions} draft={draft} onChange={set} />
-        <RadioQuestion title="When do you get your best ideas?" field="bestIdeas" options={bestIdeasOptions} draft={draft} onChange={set} />
         <RadioQuestion title="When it comes to the rules, do you:" field="rules" options={rulesOptions} draft={draft} onChange={set} />
-        <RadioQuestion
-          title="How many unread e-mails before you start to feel anxious?"
-          field="emailAnxiety"
-          options={emailAnxietyOptions}
-          draft={draft}
-          onChange={set}
-        />
         <RadioQuestion title="AI's future is..." field="aiFuture" options={aiFutureOptions} draft={draft} onChange={set} />
+        <RadioQuestion title="Your favorite dining hall is..." field="diningHall" options={diningHallOptions} draft={draft} onChange={set} />
 
         {error && <p className="error">{error}</p>}
 

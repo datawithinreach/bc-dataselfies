@@ -4,20 +4,18 @@ import {
   schoolOptions,
   continentOptions,
   chronotypeOptions,
-  bestIdeasOptions,
   rulesOptions,
-  emailAnxietyOptions,
   aiFutureOptions,
+  diningHallOptions,
 } from "../../shared/questions";
 import { AffiliationMark } from "../lib/marks";
 import {
-  SchoolPreview,
   ContinentPreview,
-  BestIdeasPreview,
-  RulesPreview,
-  ChronotypePreview,
-  AiFuturePreview,
-  AnxietyPreview,
+  DotPreview,
+  HalfFillPreview,
+  TrendArcPreview,
+  ChronotypeIconPreview,
+  DiningStampPreview,
 } from "./LegendPreview";
 
 function MiniShape({ shape }: { shape: (typeof affiliationOptions)[number]["shape"] }) {
@@ -54,10 +52,10 @@ export default function Legend({ count }: { count: number }) {
         ))}
       </LegendGroup>
 
-      <LegendGroup title="Background wash — school / dept.">
+      <LegendGroup title="Bottom fill — school / dept.">
         {schoolOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <SchoolPreview color={o.color} />
+            <HalfFillPreview color={o.color} />
             <span>{o.label}</span>
           </div>
         ))}
@@ -72,46 +70,37 @@ export default function Legend({ count }: { count: number }) {
         ))}
       </LegendGroup>
 
-      <LegendGroup title="Dot — best ideas strike...">
-        {bestIdeasOptions.map((o) => (
-          <div className="legend-row" key={o.value}>
-            <BestIdeasPreview color={o.color} />
-            <span>{o.label}</span>
-          </div>
-        ))}
-      </LegendGroup>
-
-      <LegendGroup title="Bottom fill — the rules">
-        {rulesOptions.map((o) => (
-          <div className="legend-row" key={o.value}>
-            <RulesPreview color={o.color} />
-            <span>{o.label}</span>
-          </div>
-        ))}
-      </LegendGroup>
-
-      <LegendGroup title="Arc, top — chronotype">
+      <LegendGroup title="Icon, bottom-left — early bird or night owl">
         {chronotypeOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <ChronotypePreview direction={o.direction} />
+            <ChronotypeIconPreview icon={o.icon} />
             <span>{o.label}</span>
           </div>
         ))}
       </LegendGroup>
 
-      <LegendGroup title="Tick, bottom-right — AI's future">
+      <LegendGroup title="Arc, top — AI's future">
         {aiFutureOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <AiFuturePreview direction={o.direction} />
+            <TrendArcPreview direction={o.direction} />
             <span>{o.label}</span>
           </div>
         ))}
       </LegendGroup>
 
-      <LegendGroup title="Dots, right — unread-email anxiety">
-        {emailAnxietyOptions.map((o) => (
+      <LegendGroup title="Dot — the rules">
+        {rulesOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <AnxietyPreview count={o.dots} />
+            <DotPreview color={o.color} />
+            <span>{o.label}</span>
+          </div>
+        ))}
+      </LegendGroup>
+
+      <LegendGroup title="Stamp, bottom-right — favorite dining hall">
+        {diningHallOptions.map((o) => (
+          <div className="legend-row" key={o.value}>
+            <DiningStampPreview color={o.color} />
             <span>{o.label}</span>
           </div>
         ))}
