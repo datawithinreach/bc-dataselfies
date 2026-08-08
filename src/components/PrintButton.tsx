@@ -10,6 +10,12 @@ import PortraitMark from "./PortraitMark";
 // with imprecise scissor-cutting.
 const DESIGN_IN = 2.5;
 const R = 90;
+// PortraitMark's outline circle is stroked *on* the r=R path, so half its
+// stroke width (r*0.035, per PortraitMark.tsx) renders just outside R. A
+// viewBox tight to exactly R clips that sliver off — this pads the viewBox
+// past it. (The on-screen thank-you preview doesn't hit this: its viewBox
+// already has 10 units of headroom beyond its own r=90 for other reasons.)
+const VIEWBOX_R = R + R * 0.035;
 
 export default function PrintButton({ record }: { record: ResponseRecord }) {
   return (
@@ -32,10 +38,14 @@ export default function PrintButton({ record }: { record: ResponseRecord }) {
       {createPortal(
         <div className="print-sheet" aria-hidden="true">
           {/* Fixed physical size (not 100%) so it prints at exactly DESIGN_IN
-              regardless of the page it ends up centered on. Tight viewBox
-              (matching the portrait's own radius exactly) so the design fills
-              the full circle, no wasted margin inside its own bounds. */}
-          <svg viewBox={`${-R} ${-R} ${R * 2} ${R * 2}`} width={`${DESIGN_IN}in`} height={`${DESIGN_IN}in`}>
+              regardless of the page it ends up centered on. viewBox is padded
+              to VIEWBOX_R, not tight to R, so the outline circle's stroke
+              doesn't get clipped (see VIEWBOX_R above). */}
+          <svg
+            viewBox={`${-VIEWBOX_R} ${-VIEWBOX_R} ${VIEWBOX_R * 2} ${VIEWBOX_R * 2}`}
+            width={`${DESIGN_IN}in`}
+            height={`${DESIGN_IN}in`}
+          >
             <PortraitMark record={record} r={R} />
           </svg>
         </div>,
