@@ -106,7 +106,7 @@ export function ChronotypeIconPreview({ icon }: { icon: ChronotypeIcon }) {
   return (
     <PreviewFrame>
       <BaseCircle />
-      <path d={moonPathD(R * 0.85)} fill="#1a1a1a" fillOpacity={0.5} fillRule="evenodd" />
+      <path d={moonPathD(R)} fill="#003957" fillOpacity={0.9} fillRule="evenodd" />
     </PreviewFrame>
   );
 }

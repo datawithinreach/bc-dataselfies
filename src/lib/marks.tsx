@@ -166,18 +166,22 @@ export function ChronotypeMark({ icon, r }: { icon: ChronotypeIcon; r: number })
     );
   }
 
-  return <path d={moonPathD(r * 0.85)} fill="#1a1a1a" fillOpacity={0.5} fillRule="evenodd" />;
+  // Outer edge exactly r so it coincides with the portrait's own circle
+  // boundary instead of floating as a visibly smaller, separate disc.
+  return <path d={moonPathD(r)} fill="#003957" fillOpacity={0.9} fillRule="evenodd" />;
 }
 
 /**
  * Crescent moon as two full circles combined with evenodd fill: an outer
  * disc minus a smaller disc offset toward one side (fully contained within
- * it, so no stray sliver from the inner circle's own edge shows up).
+ * it, so no stray sliver from the inner circle's own edge shows up). Inner
+ * circle is close in size to the outer one and only slightly offset, which
+ * keeps the resulting sliver thin rather than a fat half-moon.
  */
 export function moonPathD(size: number): string {
   const R = size;
-  const r2 = size * 0.65;
-  const dx = size * 0.3; // dx + r2 < R keeps the inner circle fully inside the outer one
+  const r2 = size * 0.85;
+  const dx = size * 0.1; // dx + r2 < R keeps the inner circle fully inside the outer one
   const circle = (cx: number, radius: number) =>
     `M ${cx - radius} 0 A ${radius} ${radius} 0 1 0 ${cx + radius} 0 A ${radius} ${radius} 0 1 0 ${cx - radius} 0 Z`;
   return `${circle(0, R)} ${circle(dx, r2)}`;
