@@ -15,7 +15,7 @@ import {
   HalfFillPreview,
   TrendArcPreview,
   ChronotypeIconPreview,
-  DiningStampPreview,
+  DiningDotsPreview,
 } from "./LegendPreview";
 
 function MiniShape({ shape }: { shape: (typeof affiliationOptions)[number]["shape"] }) {
@@ -70,7 +70,7 @@ export default function Legend({ count }: { count: number }) {
         ))}
       </LegendGroup>
 
-      <LegendGroup title="Icon, bottom-left — early bird or night owl">
+      <LegendGroup title="Sun rays / moon — early bird or night owl">
         {chronotypeOptions.map((o) => (
           <div className="legend-row" key={o.value}>
             <ChronotypeIconPreview icon={o.icon} />
@@ -79,7 +79,7 @@ export default function Legend({ count }: { count: number }) {
         ))}
       </LegendGroup>
 
-      <LegendGroup title="Arc, top — AI's future">
+      <LegendGroup title="Arc, inset near top — AI's future">
         {aiFutureOptions.map((o) => (
           <div className="legend-row" key={o.value}>
             <TrendArcPreview direction={o.direction} />
@@ -97,10 +97,10 @@ export default function Legend({ count }: { count: number }) {
         ))}
       </LegendGroup>
 
-      <LegendGroup title="Stamp, bottom-right — favorite dining hall">
+      <LegendGroup title="Dots (count) — favorite dining hall">
         {diningHallOptions.map((o) => (
           <div className="legend-row" key={o.value}>
-            <DiningStampPreview color={o.color} />
+            <DiningDotsPreview count={o.dots} />
             <span>{o.label}</span>
           </div>
         ))}

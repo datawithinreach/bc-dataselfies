@@ -73,29 +73,30 @@ export function TrendArcPreview({ direction }: { direction: ArcDirection }) {
   );
 }
 
-/** Sun or crescent moon icon — used for "early bird / night owl". */
+/**
+ * Sun (ring of inset rays) or crescent moon (inset in the circle itself) —
+ * used for "early bird / night owl". Mirrors ChronotypeMark in lib/marks.tsx,
+ * which uses the portrait's own main circle rather than a separate icon.
+ */
 export function ChronotypeIconPreview({ icon }: { icon: ChronotypeIcon }) {
-  const size = R * 0.45;
-  const sw = 2.2;
-
   if (icon === "sun") {
-    const rays = Array.from({ length: 8 }, (_, i) => {
-      const a = (Math.PI * 2 * i) / 8;
+    const rayCount = 10;
+    const rays = Array.from({ length: rayCount }, (_, i) => {
+      const a = (Math.PI * 2 * i) / rayCount;
       return (
         <line
           key={i}
-          x1={Math.cos(a) * size * 1.45}
-          y1={Math.sin(a) * size * 1.45}
-          x2={Math.cos(a) * size * 2.05}
-          y2={Math.sin(a) * size * 2.05}
+          x1={Math.cos(a) * R * 0.78}
+          y1={Math.sin(a) * R * 0.78}
+          x2={Math.cos(a) * R * 0.95}
+          y2={Math.sin(a) * R * 0.95}
         />
       );
     });
     return (
       <PreviewFrame>
         <BaseCircle />
-        <g stroke="#1a1a1a" strokeWidth={sw} strokeLinecap="round">
-          <circle r={size} fill="none" />
+        <g stroke="#1a1a1a" strokeWidth={1.8} strokeLinecap="round">
           {rays}
         </g>
       </PreviewFrame>
@@ -105,27 +106,30 @@ export function ChronotypeIconPreview({ icon }: { icon: ChronotypeIcon }) {
   return (
     <PreviewFrame>
       <BaseCircle />
-      <path d={moonPathD(size)} fill="#1a1a1a" fillRule="evenodd" />
+      <path d={moonPathD(R * 0.85)} fill="#1a1a1a" fillOpacity={0.5} fillRule="evenodd" />
     </PreviewFrame>
   );
 }
 
-/** Colored diamond "stamp" — used for "favorite dining hall". */
-export function DiningStampPreview({ color }: { color: string }) {
-  const size = R * 0.7;
+/** Cluster of black dots (count-coded) — used for "favorite dining hall". */
+export function DiningDotsPreview({ count }: { count: number }) {
+  const dotR = 2.2;
+  const spacing = R * 0.4;
+  const cols = 3;
+  const cx = R * 0.1;
+  const cy = R * 0.15;
   return (
     <PreviewFrame>
       <BaseCircle />
-      <rect
-        x={-size / 2}
-        y={-size / 2}
-        width={size}
-        height={size}
-        fill={color}
-        stroke="#1a1a1a"
-        strokeWidth={1.4}
-        transform="rotate(45)"
-      />
+      <g fill="#1a1a1a">
+        {Array.from({ length: count }).map((_, i) => {
+          const col = i % cols;
+          const row = Math.floor(i / cols);
+          const rowCount = Math.min(cols, count - row * cols);
+          const rowOffset = ((rowCount - 1) * spacing) / 2;
+          return <circle key={i} cx={cx - rowOffset + col * spacing} cy={cy + row * spacing} r={dotR} />;
+        })}
+      </g>
     </PreviewFrame>
   );
 }

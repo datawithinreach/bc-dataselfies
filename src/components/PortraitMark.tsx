@@ -10,16 +10,13 @@ import {
   findOption,
 } from "../../shared/questions";
 import { makeRng } from "../lib/hash";
-import { AffiliationMark, ContinentLines, TrendArc, ChronotypeMark, DiningStamp } from "../lib/marks";
+import { AffiliationMark, ContinentLines, TrendArc, ChronotypeMark, DiningDots } from "../lib/marks";
 
-const CONTINENT_ANGLES: Record<string, number> = {
-  na: -20,
-  sa: 15,
-  eu: 45,
-  af: -55,
-  as: 70,
-  oc: -80,
-};
+// The affiliation shape is drawn a bit smaller than the full radius so it
+// doesn't crowd the continent lines, which now sit at a fixed angle/position
+// on every portrait (rather than rotating per-continent) and need to stay
+// findable without the shape constantly overlapping them.
+const AFFILIATION_SCALE = 0.72;
 
 export interface PortraitMarkProps {
   record: ResponseRecord;
@@ -45,8 +42,6 @@ export default function PortraitMark({ record, x = 0, y = 0, r, onClick }: Portr
   const aiFuture = findOption(aiFutureOptions, record.aiFuture);
   const diningHall = findOption(diningHallOptions, record.diningHall);
 
-  const angle = CONTINENT_ANGLES[continent.value] ?? 0;
-
   return (
     <g transform={`translate(${x} ${y})`} onClick={onClick} style={{ cursor: onClick ? "pointer" : undefined }}>
       {/* neutral base */}
@@ -55,15 +50,17 @@ export default function PortraitMark({ record, x = 0, y = 0, r, onClick }: Portr
       <path d={`M ${-r} 0 A ${r} ${r} 0 0 0 ${r} 0 Z`} fill={school.color} opacity={0.6} />
       <circle r={r} fill="none" stroke="#c9bfa8" strokeWidth={Math.max(1, r * 0.035)} />
 
-      <ContinentLines color={continent.color} r={r} angle={angle} />
-      <AffiliationMark shape={affiliation.shape} r={r} rng={rng} />
+      {/* early bird / night owl, drawn early so the shape/lines/dot below stay on top of it */}
+      <ChronotypeMark icon={chronotype.icon} r={r} />
+
+      <ContinentLines color={continent.color} r={r} />
+      <AffiliationMark shape={affiliation.shape} r={r * AFFILIATION_SCALE} rng={rng} />
 
       {/* rules, single colored dot */}
       <circle cx={-r * 0.62} cy={-r * 0.5} r={Math.max(2, r * 0.16)} fill={rules.color} />
 
-      <ChronotypeMark icon={chronotype.icon} r={r} />
       <TrendArc direction={aiFuture.direction} r={r} />
-      <DiningStamp color={diningHall.color} r={r} />
+      <DiningDots count={diningHall.dots} r={r} />
     </g>
   );
 }

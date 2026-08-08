@@ -45,10 +45,14 @@ export function AffiliationMark({ shape, r, rng }: ShapeProps) {
       );
     }
     case "circle": {
+      // Both circles share one offset so they stay concentric — using two
+      // independent jitter() calls here previously let them drift apart.
+      const dx = jitter(4);
+      const dy = jitter(4);
       return (
         <g>
-          <circle cx={jitter(4)} cy={jitter(4)} r={r * 0.5} {...common} />
-          <circle cx={jitter(4)} cy={jitter(4)} r={r * 0.3} {...common} strokeWidth={sw * 0.8} />
+          <circle cx={dx} cy={dy} r={r * 0.5} {...common} />
+          <circle cx={dx} cy={dy} r={r * 0.3} {...common} strokeWidth={sw * 0.8} />
         </g>
       );
     }
@@ -99,23 +103,29 @@ function hex(radius: number, rotateDeg: number): string {
   return pts.join(" ");
 }
 
-export function ContinentLines({ color, r, angle }: { color: string; r: number; angle: number }) {
+// Fixed so the two lines always sit in the same place/orientation on every
+// portrait — only their color changes — making them easy to spot at a glance
+// across the whole wall instead of hunting for them at a different angle
+// on every node.
+const CONTINENT_LINE_ANGLE = -18;
+
+export function ContinentLines({ color, r }: { color: string; r: number }) {
   const len = r * 1.3;
   const gap = r * 0.16;
   const sw = Math.max(1.2, r * 0.06);
   return (
-    <g transform={`rotate(${angle})`} stroke={color} strokeWidth={sw} strokeLinecap="round">
+    <g transform={`rotate(${CONTINENT_LINE_ANGLE})`} stroke={color} strokeWidth={sw} strokeLinecap="round">
       <line x1={-len / 2} y1={-gap / 2} x2={len / 2} y2={-gap / 2} />
       <line x1={-len / 2} y1={gap / 2} x2={len / 2} y2={gap / 2} />
     </g>
   );
 }
 
-/** A small curve above the circle: swoops up for "bright", down for "grim" — reads like a trend line. */
+/** A small curve inset near the top of the circle: swoops up for "bright", down for "grim". */
 export function TrendArc({ direction, r }: { direction: ArcDirection; r: number }) {
-  const w = r * 0.55;
-  const h = r * 0.28 * (direction === "up" ? -1 : 1);
-  const y = -r * 1.12;
+  const w = r * 0.4;
+  const h = r * 0.2 * (direction === "up" ? -1 : 1);
+  const y = -r * 0.68;
   const sw = Math.max(1.2, r * 0.06);
   return (
     <path
@@ -128,39 +138,35 @@ export function TrendArc({ direction, r }: { direction: ArcDirection; r: number 
   );
 }
 
-/** A small sun (early bird) or crescent moon (night owl), bottom-left of the circle. */
+/**
+ * Early bird / night owl, drawn using the portrait's own main circle rather
+ * than a separate small icon: a ring of rays inset just inside the rim for
+ * "sun", or a bold crescent inset within the circle for "moon".
+ */
 export function ChronotypeMark({ icon, r }: { icon: ChronotypeIcon; r: number }) {
-  const cx = -r * 0.55;
-  const cy = r * 1.15;
-  const size = r * 0.22;
-  const sw = Math.max(1.3, r * 0.06);
-
   if (icon === "sun") {
-    const rays = Array.from({ length: 8 }, (_, i) => {
-      const a = (Math.PI * 2 * i) / 8;
+    const sw = Math.max(1.2, r * 0.05);
+    const rayCount = 10;
+    const rays = Array.from({ length: rayCount }, (_, i) => {
+      const a = (Math.PI * 2 * i) / rayCount;
       return (
         <line
           key={i}
-          x1={Math.cos(a) * size * 1.45}
-          y1={Math.sin(a) * size * 1.45}
-          x2={Math.cos(a) * size * 2.05}
-          y2={Math.sin(a) * size * 2.05}
+          x1={Math.cos(a) * r * 0.82}
+          y1={Math.sin(a) * r * 0.82}
+          x2={Math.cos(a) * r * 0.96}
+          y2={Math.sin(a) * r * 0.96}
         />
       );
     });
     return (
-      <g transform={`translate(${cx} ${cy})`} stroke="#1a1a1a" strokeWidth={sw} strokeLinecap="round">
-        <circle r={size} fill="none" />
+      <g stroke="#1a1a1a" strokeWidth={sw} strokeLinecap="round">
         {rays}
       </g>
     );
   }
 
-  return (
-    <g transform={`translate(${cx} ${cy})`}>
-      <path d={moonPathD(size)} fill="#1a1a1a" fillRule="evenodd" />
-    </g>
-  );
+  return <path d={moonPathD(r * 0.85)} fill="#1a1a1a" fillOpacity={0.5} fillRule="evenodd" />;
 }
 
 /**
@@ -177,22 +183,22 @@ export function moonPathD(size: number): string {
   return `${circle(0, R)} ${circle(dx, r2)}`;
 }
 
-/** A small colored diamond "stamp" below the circle, for favorite dining hall. */
-export function DiningStamp({ color, r }: { color: string; r: number }) {
-  const x = r * 0.82;
-  const y = r * 0.95;
-  const size = r * 0.34;
-  const sw = Math.max(1, r * 0.045);
+/** A small cluster of dots inset in the circle, one per dining hall (count-coded, not color-coded). */
+export function DiningDots({ count, r }: { count: number; r: number }) {
+  const dotR = Math.max(1.2, r * 0.07);
+  const spacing = r * 0.19;
+  const cols = 3;
+  const cx = r * 0.32;
+  const cy = r * 0.42;
   return (
-    <rect
-      x={x - size / 2}
-      y={y - size / 2}
-      width={size}
-      height={size}
-      fill={color}
-      stroke="#1a1a1a"
-      strokeWidth={sw}
-      transform={`rotate(45 ${x} ${y})`}
-    />
+    <g fill="#1a1a1a">
+      {Array.from({ length: count }).map((_, i) => {
+        const col = i % cols;
+        const row = Math.floor(i / cols);
+        const rowCount = Math.min(cols, count - row * cols);
+        const rowOffset = ((rowCount - 1) * spacing) / 2;
+        return <circle key={i} cx={cx - rowOffset + col * spacing} cy={cy + row * spacing} r={dotR} />;
+      })}
+    </g>
   );
 }

@@ -110,10 +110,10 @@ export default function SubmitPage() {
     return (
       <div className="page submit-page thankyou">
         <div className="thankyou-card">
-          {/* Several marks (AI-future arc, chronotype icon, dining stamp) are drawn
-              outside the main circle on purpose, up to ~1.6x the radius — this
-              viewBox needs real padding or they get cropped. */}
-          <svg viewBox="-155 -155 310 310" width={260} height={260}>
+          {/* Every mark now lives inside the main circle's radius, so this only
+              needs a small margin — not the large padding earlier versions
+              needed for marks drawn outside the boundary. */}
+          <svg viewBox="-100 -100 200 200" width={220} height={220}>
             <PortraitMark record={submitted} r={90} />
           </svg>
           <h1>Thanks, {submitted.name.split(" ")[0]}!</h1>

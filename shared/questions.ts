@@ -3,14 +3,15 @@ import { palette } from "./palette";
 // The visual vocabulary, BC-Data-Selfies edition.
 // Loosely modeled on Giorgia Lupi's TED "Data Selfies" (2017): every answer
 // maps to one distinct visual channel on a person's circular "portrait" mark.
+// Every mark now lives inside the main circle's own boundary.
 // Channel -> question:
-//   base shape (black ink)         -> affiliation
-//   colored bottom half-fill       -> school / department
-//   two colored parallel lines     -> continent
-//   sun / moon icon, top           -> early bird / night owl
-//   colored arc, top               -> AI's future: bright / grim
-//   single colored dot             -> rules: follow / fudge / ignore
-//   colored diamond stamp, bottom  -> favorite dining hall
+//   base shape (black ink), center            -> affiliation
+//   colored bottom half-fill                  -> school / department
+//   two colored parallel lines, fixed angle    -> continent
+//   ring of rays (sun) / crescent (moon)       -> early bird / night owl
+//   small arc, inset near top                  -> AI's future: bright / grim
+//   single colored dot                         -> rules: follow / fudge / ignore
+//   cluster of black dots (count-coded)        -> favorite dining hall
 
 export interface Option<Extra extends Record<string, unknown> = Record<string, never>> {
   value: string;
@@ -34,6 +35,10 @@ export interface ArcOption extends Option {
 export type ChronotypeIcon = "sun" | "moon";
 export interface ChronotypeOption extends Option {
   icon: ChronotypeIcon;
+}
+
+export interface DotCountOption extends Option {
+  dots: number;
 }
 
 export const affiliationOptions: AffiliationOption[] = [
@@ -79,13 +84,13 @@ export const aiFutureOptions: ArcOption[] = [
   { value: "grim", label: "Grim", direction: "down" },
 ];
 
-export const diningHallOptions: ColorOption[] = [
-  { value: "hillside", label: "Hillside Cafe", color: palette.gold },
-  { value: "lower_live", label: "Lower Live", color: palette.darkBlue },
-  { value: "tully", label: "Tully Cafe", color: palette.burntOrange },
-  { value: "eagles_nest", label: "Eagle's Nest", color: palette.maroon },
-  { value: "carney", label: "Carney Dining Room", color: palette.darkSlateBlue },
-  { value: "coro", label: "CoRo Cafe", color: palette.yellowGold },
+export const diningHallOptions: DotCountOption[] = [
+  { value: "hillside", label: "Hillside Cafe", dots: 1 },
+  { value: "lower_live", label: "Lower Live", dots: 2 },
+  { value: "tully", label: "Tully Cafe", dots: 3 },
+  { value: "eagles_nest", label: "Eagle's Nest", dots: 4 },
+  { value: "carney", label: "Carney Dining Room", dots: 5 },
+  { value: "coro", label: "CoRo Cafe", dots: 6 },
 ];
 
 export interface ResponseInput {
