@@ -17,6 +17,7 @@ import {
   ChronotypeIconPreview,
   DiningDotsPreview,
 } from "./LegendPreview";
+import DataControls from "./DataControls";
 
 function MiniShape({ shape }: { shape: (typeof affiliationOptions)[number]["shape"] }) {
   return (
@@ -105,6 +106,8 @@ export default function Legend({ count }: { count: number }) {
           </div>
         ))}
       </LegendGroup>
+
+      <DataControls />
     </aside>
   );
 }

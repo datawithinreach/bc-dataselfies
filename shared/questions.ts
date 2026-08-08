@@ -114,3 +114,40 @@ export function findOption<T extends Option>(options: T[], value: string): T {
   if (!found) throw new Error(`Unknown option value: ${value}`);
   return found;
 }
+
+const VALID_VALUES: Record<Exclude<keyof ResponseInput, "name">, Set<string>> = {
+  affiliation: new Set(affiliationOptions.map((o) => o.value)),
+  school: new Set(schoolOptions.map((o) => o.value)),
+  continent: new Set(continentOptions.map((o) => o.value)),
+  chronotype: new Set(chronotypeOptions.map((o) => o.value)),
+  rules: new Set(rulesOptions.map((o) => o.value)),
+  aiFuture: new Set(aiFutureOptions.map((o) => o.value)),
+  diningHall: new Set(diningHallOptions.map((o) => o.value)),
+};
+
+/**
+ * Validates an unknown value (e.g. from an uploaded JSON file) against the
+ * current question set, returning a clean ResponseInput or null. Guards
+ * against bad/stale data crashing the wall — every answer eventually flows
+ * into findOption(), which throws on an unrecognized value, and that would
+ * take down the whole portrait list rather than just the one bad record.
+ */
+export function sanitizeResponseInput(input: unknown): ResponseInput | null {
+  if (typeof input !== "object" || input === null) return null;
+  const record = input as Record<string, unknown>;
+  for (const field of Object.keys(VALID_VALUES) as (keyof typeof VALID_VALUES)[]) {
+    const value = record[field];
+    if (typeof value !== "string" || !VALID_VALUES[field].has(value)) return null;
+  }
+  const name = typeof record.name === "string" ? record.name.trim().slice(0, 80) : "";
+  return {
+    name,
+    affiliation: record.affiliation as string,
+    school: record.school as string,
+    continent: record.continent as string,
+    chronotype: record.chronotype as string,
+    rules: record.rules as string,
+    aiFuture: record.aiFuture as string,
+    diningHall: record.diningHall as string,
+  };
+}
