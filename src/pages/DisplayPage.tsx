@@ -12,14 +12,22 @@ function useElementSize<T extends HTMLElement>() {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
+    let debounceTimer: ReturnType<typeof setTimeout> | null = null;
     const observer = new ResizeObserver((entries) => {
       const entry = entries[0];
-      if (entry) {
+      if (!entry) return;
+      // Debounced so an active window drag-resize restarts the force
+      // simulation once it settles, not dozens of times mid-drag.
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
         setSize({ width: entry.contentRect.width, height: entry.contentRect.height });
-      }
+      }, 200);
     });
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      observer.disconnect();
+    };
   }, []);
 
   return [ref, size] as const;

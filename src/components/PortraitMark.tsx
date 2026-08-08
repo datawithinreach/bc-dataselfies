@@ -42,8 +42,19 @@ export default function PortraitMark({ record, x = 0, y = 0, r, onClick }: Portr
   const aiFuture = findOption(aiFutureOptions, record.aiFuture);
   const diningHall = findOption(diningHallOptions, record.diningHall);
 
+  // Native SVG tooltip on hover. Deliberately leaves the name out — it's
+  // collected but never shown on /display, same as everywhere else on this
+  // page.
+  const tooltip = [
+    `${affiliation.label} — ${school.label}`,
+    `${continent.label} · ${chronotype.label}`,
+    `Rules: ${rules.label} · AI's future: ${aiFuture.label}`,
+    `Dining hall: ${diningHall.label}`,
+  ].join("\n");
+
   return (
     <g transform={`translate(${x} ${y})`} onClick={onClick} style={{ cursor: onClick ? "pointer" : undefined }}>
+      <title>{tooltip}</title>
       {/* neutral base */}
       <circle r={r} fill="#e6e0d2" />
       {/* school / dept, bottom half-fill */}

@@ -38,15 +38,21 @@ export function useForceLayout(records: ResponseRecord[], width: number, height:
   const [nodes, setNodes] = useState<SimNode[]>([]);
   const nodesRef = useRef<Map<string, SimNode>>(new Map());
   const simRef = useRef<ReturnType<typeof forceSimulation<SimNode>> | null>(null);
+  // The x/y forces read cluster targets from here on every tick, so updating
+  // this ref (instead of baking centers into a closure at creation time) is
+  // enough to make the whole layout re-target itself — including on resize,
+  // when the simulation object itself is reused rather than recreated.
+  const centersRef = useRef<Map<string, { x: number; y: number }>>(new Map());
+  const centerForceRef = useRef<ReturnType<typeof forceCenter<SimNode>> | null>(null);
 
   useEffect(() => {
     if (width === 0 || height === 0) return;
-    const centers = clusterCenters(width, height);
+    centersRef.current = clusterCenters(width, height);
     const map = nodesRef.current;
 
     for (const record of records) {
       if (!map.has(record.id)) {
-        const center = centers.get(record.school) ?? { x: width / 2, y: height / 2 };
+        const center = centersRef.current.get(record.school) ?? { x: width / 2, y: height / 2 };
         map.set(record.id, {
           id: record.id,
           record,
@@ -65,22 +71,27 @@ export function useForceLayout(records: ResponseRecord[], width: number, height:
     const currentNodes = Array.from(map.values());
 
     if (!simRef.current) {
+      const centerForce = forceCenter<SimNode>(width / 2, height / 2).strength(0.02);
+      centerForceRef.current = centerForce;
       simRef.current = forceSimulation<SimNode>(currentNodes)
         .force("charge", forceManyBody().strength(-40))
         .force("collide", forceCollide<SimNode>((d) => d.r + 6))
         .force(
           "x",
-          forceX<SimNode>((d) => centers.get(d.record.school)?.x ?? width / 2).strength(0.08),
+          forceX<SimNode>((d) => centersRef.current.get(d.record.school)?.x ?? width / 2).strength(0.08),
         )
         .force(
           "y",
-          forceY<SimNode>((d) => centers.get(d.record.school)?.y ?? height / 2).strength(0.08),
+          forceY<SimNode>((d) => centersRef.current.get(d.record.school)?.y ?? height / 2).strength(0.08),
         )
-        .force("center", forceCenter(width / 2, height / 2).strength(0.02))
+        .force("center", centerForce)
         .alphaDecay(0.02)
         .on("tick", () => setNodes([...map.values()]));
     } else {
       simRef.current.nodes(currentNodes);
+      // forceCenter doesn't take an accessor function like x/y do, so its
+      // target has to be pushed in explicitly whenever the canvas resizes.
+      centerForceRef.current?.x(width / 2).y(height / 2);
     }
     simRef.current.alpha(Math.max(simRef.current.alpha(), 0.5)).restart();
 
