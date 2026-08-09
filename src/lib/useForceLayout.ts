@@ -8,8 +8,8 @@ import {
   forceCenter,
   type SimulationNodeDatum,
 } from "d3-force";
-import type { ResponseRecord } from "../../shared/questions";
-import { schoolOptions } from "../../shared/questions";
+import type { ClusterField, Option, ResponseRecord } from "../../shared/questions";
+import { clusterableFields } from "../../shared/questions";
 
 export interface SimNode extends SimulationNodeDatum {
   id: string;
@@ -19,40 +19,59 @@ export interface SimNode extends SimulationNodeDatum {
 
 const NODE_R = 26;
 
-function clusterCenters(width: number, height: number) {
-  const cx = width / 2;
-  const cy = height / 2;
-  const layoutR = Math.min(width, height) * 0.32;
+// Cluster centers live in a fixed "world" space, not canvas pixels — the
+// wall's own zoom-to-fit transform (useZoomToFit) maps this into whatever
+// the canvas size actually is. That split is what lets the ring grow with
+// the data instead of being squeezed to fit a fixed viewport up front.
+function clusterCenters(counts: Map<string, number>, options: Option[]) {
+  // Per-option "footprint" radius: roughly the radius of a hex-packed
+  // circle holding that many nodes, so a bigger group claims a bigger
+  // slice of the ring instead of every option getting equal space.
+  const footprints = options.map((o) => {
+    const count = counts.get(o.value) ?? 0;
+    return Math.max(NODE_R * 1.6, NODE_R * 1.15 * Math.sqrt(Math.max(count, 1)));
+  });
+  const totalFootprint = footprints.reduce((a, b) => a + b, 0);
+  // Ring radius chosen so neighboring cluster footprints are roughly
+  // tangent to each other — circumference ~= sum of cluster diameters —
+  // which is what pulls the clusters snugly into one big circle instead of
+  // leaving gaps between them.
+  const ringR = Math.max(totalFootprint / Math.PI, NODE_R * 3);
+
   const centers = new Map<string, { x: number; y: number }>();
-  schoolOptions.forEach((school, i) => {
-    const angle = (Math.PI * 2 * i) / schoolOptions.length - Math.PI / 2;
-    centers.set(school.value, {
-      x: cx + layoutR * Math.cos(angle),
-      y: cy + layoutR * Math.sin(angle),
-    });
+  let angle = -Math.PI / 2;
+  options.forEach((o, i) => {
+    const share = (footprints[i] / totalFootprint) * Math.PI * 2;
+    const mid = angle + share / 2;
+    centers.set(o.value, { x: ringR * Math.cos(mid), y: ringR * Math.sin(mid) });
+    angle += share;
   });
   return centers;
 }
 
-export function useForceLayout(records: ResponseRecord[], width: number, height: number) {
+export function useForceLayout(records: ResponseRecord[], clusterBy: ClusterField) {
   const [nodes, setNodes] = useState<SimNode[]>([]);
   const nodesRef = useRef<Map<string, SimNode>>(new Map());
   const simRef = useRef<ReturnType<typeof forceSimulation<SimNode>> | null>(null);
-  // The x/y forces read cluster targets from here on every tick, so updating
-  // this ref (instead of baking centers into a closure at creation time) is
-  // enough to make the whole layout re-target itself — including on resize,
-  // when the simulation object itself is reused rather than recreated.
+  // Read live by the x/y force accessors on every tick, so retargeting
+  // (new data, or the user picking a different cluster field) just means
+  // updating this ref rather than recreating the simulation.
   const centersRef = useRef<Map<string, { x: number; y: number }>>(new Map());
   const centerForceRef = useRef<ReturnType<typeof forceCenter<SimNode>> | null>(null);
 
   useEffect(() => {
-    if (width === 0 || height === 0) return;
-    centersRef.current = clusterCenters(width, height);
+    const fieldOptions = clusterableFields.find((f) => f.field === clusterBy)?.options ?? [];
+    const counts = new Map<string, number>();
+    for (const record of records) {
+      const value = record[clusterBy];
+      counts.set(value, (counts.get(value) ?? 0) + 1);
+    }
+    centersRef.current = clusterCenters(counts, fieldOptions);
     const map = nodesRef.current;
 
     for (const record of records) {
       if (!map.has(record.id)) {
-        const center = centersRef.current.get(record.school) ?? { x: width / 2, y: height / 2 };
+        const center = centersRef.current.get(record[clusterBy]) ?? { x: 0, y: 0 };
         map.set(record.id, {
           id: record.id,
           record,
@@ -60,6 +79,10 @@ export function useForceLayout(records: ResponseRecord[], width: number, height:
           x: center.x + (Math.random() - 0.5) * 40,
           y: center.y + (Math.random() - 0.5) * 40,
         });
+      } else {
+        // The record object itself may have changed shape (e.g. an
+        // import), so keep it fresh even though the sim node persists.
+        map.get(record.id)!.record = record;
       }
     }
     // Drop nodes for records that were cleared (e.g. after a reset).
@@ -71,32 +94,35 @@ export function useForceLayout(records: ResponseRecord[], width: number, height:
     const currentNodes = Array.from(map.values());
 
     if (!simRef.current) {
-      const centerForce = forceCenter<SimNode>(width / 2, height / 2).strength(0.02);
+      const centerForce = forceCenter<SimNode>(0, 0).strength(0.02);
       centerForceRef.current = centerForce;
       simRef.current = forceSimulation<SimNode>(currentNodes)
-        .force("charge", forceManyBody().strength(-40))
-        .force("collide", forceCollide<SimNode>((d) => d.r + 6))
-        .force(
-          "x",
-          forceX<SimNode>((d) => centersRef.current.get(d.record.school)?.x ?? width / 2).strength(0.08),
-        )
-        .force(
-          "y",
-          forceY<SimNode>((d) => centersRef.current.get(d.record.school)?.y ?? height / 2).strength(0.08),
-        )
+        .force("charge", forceManyBody().strength(-6))
+        .force("collide", forceCollide<SimNode>((d) => d.r + 4).iterations(2))
         .force("center", centerForce)
-        .alphaDecay(0.02)
-        .on("tick", () => setNodes([...map.values()]));
+        .alphaDecay(0.02);
     } else {
       simRef.current.nodes(currentNodes);
-      // forceCenter doesn't take an accessor function like x/y do, so its
-      // target has to be pushed in explicitly whenever the canvas resizes.
-      centerForceRef.current?.x(width / 2).y(height / 2);
+      centerForceRef.current?.x(0).y(0);
     }
-    simRef.current.alpha(Math.max(simRef.current.alpha(), 0.5)).restart();
 
+    // Rebound every run (not just on creation) so a cluster-field change
+    // retargets existing nodes instead of leaving the accessor pinned to
+    // whichever field was active when the simulation was first built.
+    simRef.current
+      .force(
+        "x",
+        forceX<SimNode>((d) => centersRef.current.get(d.record[clusterBy])?.x ?? 0).strength(0.15),
+      )
+      .force(
+        "y",
+        forceY<SimNode>((d) => centersRef.current.get(d.record[clusterBy])?.y ?? 0).strength(0.15),
+      )
+      .on("tick", () => setNodes([...map.values()]));
+
+    simRef.current.alpha(Math.max(simRef.current.alpha(), 0.6)).restart();
     setNodes(currentNodes);
-  }, [records, width, height]);
+  }, [records, clusterBy]);
 
   useEffect(() => {
     return () => {

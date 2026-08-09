@@ -133,8 +133,12 @@ each time.
   `shared/palette.ts`. Every question maps to exactly one visual channel
   (shape, background wash, line color, dot, arc, tick, dot-count) — see the
   comment at the top of `shared/questions.ts` for the full mapping.
-- **Cluster grouping on the display** — currently clusters by school/dept
-  (`src/lib/useForceLayout.ts`); change `clusterCenters()` to cluster by a
-  different field if you'd rather group by affiliation type, for example.
+- **Cluster grouping on the display** — defaults to school/dept, but any
+  question can be picked live: click a section header in the `/display`
+  legend (e.g. "Parallel lines — continent") to re-cluster the wall by that
+  question. The wall auto zooms/pans to keep every portrait in view as the
+  formation grows. See `clusterableFields` in `shared/questions.ts` for the
+  list of clusterable questions and `src/lib/useForceLayout.ts` for the
+  packing logic.
 - **Names are collected but never rendered** on `/display` — they're only
   stored alongside the other answers in `localStorage`, per BC CS's request.

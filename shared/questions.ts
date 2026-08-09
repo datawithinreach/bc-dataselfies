@@ -93,6 +93,19 @@ export const diningHallOptions: DotCountOption[] = [
   { value: "coro", label: "CoRo Cafe", dots: 6 },
 ];
 
+export type ClusterField = Exclude<keyof ResponseInput, "name">;
+
+// Order here also determines the legend's group order.
+export const clusterableFields: { field: ClusterField; options: Option[] }[] = [
+  { field: "affiliation", options: affiliationOptions },
+  { field: "school", options: schoolOptions },
+  { field: "continent", options: continentOptions },
+  { field: "chronotype", options: chronotypeOptions },
+  { field: "rules", options: rulesOptions },
+  { field: "aiFuture", options: aiFutureOptions },
+  { field: "diningHall", options: diningHallOptions },
+];
+
 export interface ResponseInput {
   name: string;
   affiliation: string;

@@ -357,9 +357,15 @@ body {
 }
 
 .legend-title p {
-  margin: 0 0 20px;
+  margin: 0 0 4px;
   color: var(--warm-gray);
   font-size: 13px;
+}
+
+.legend-hint {
+  margin: 0 0 20px !important;
+  font-size: 12px !important;
+  font-style: italic;
 }
 
 .legend-group {
@@ -367,6 +373,9 @@ body {
 }
 
 .legend-group h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -374,6 +383,31 @@ body {
   border-bottom: 1px solid var(--border);
   padding-bottom: 6px;
   margin: 0 0 8px;
+}
+
+.legend-group h3.clusterable {
+  cursor: pointer;
+}
+
+.legend-group h3.clusterable:hover {
+  color: var(--maroon);
+}
+
+.legend-group h3.clusterable.active {
+  color: var(--maroon);
+  border-bottom-color: var(--maroon);
+}
+
+.cluster-badge {
+  flex-shrink: 0;
+  background: var(--maroon);
+  color: #fff;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
 }
 
 .legend-row {

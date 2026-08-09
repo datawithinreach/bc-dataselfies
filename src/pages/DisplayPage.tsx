@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { describeResponse } from "../../shared/questions";
+import { describeResponse, type ClusterField } from "../../shared/questions";
 import { useResponses } from "../lib/useResponses";
 import { useForceLayout } from "../lib/useForceLayout";
+import { useZoomToFit } from "../lib/useZoomToFit";
 import { resetResponses } from "../lib/storage";
 import PortraitMark from "../components/PortraitMark";
 import Legend from "../components/Legend";
@@ -43,31 +44,37 @@ function handleResetClick() {
 export default function DisplayPage() {
   const { records } = useResponses();
   const [canvasRef, { width, height }] = useElementSize<HTMLDivElement>();
-  const nodes = useForceLayout(records, width, height);
+  const [clusterBy, setClusterBy] = useState<ClusterField>("school");
+  const nodes = useForceLayout(records, clusterBy);
+  const { scale, tx, ty } = useZoomToFit(nodes, width, height);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
 
   const hoveredNode = hoveredId ? nodes.find((n) => n.id === hoveredId) : undefined;
+  // Nodes live in the force sim's world space; the tooltip is a plain HTML
+  // element, so its screen position has to go through the same zoom-to-fit
+  // transform the <g> below applies to the SVG contents.
+  const tooltipLeft = hoveredNode ? tx + (hoveredNode.x ?? 0) * scale : 0;
+  const tooltipTop = hoveredNode ? ty + ((hoveredNode.y ?? 0) - hoveredNode.r) * scale : 0;
 
   return (
     <div className="page display-page">
       <div className="canvas" ref={canvasRef}>
         <svg width={width} height={height}>
-          {nodes.map((n) => (
-            <PortraitMark
-              key={n.id}
-              record={n.record}
-              x={n.x ?? 0}
-              y={n.y ?? 0}
-              r={n.r}
-              onHoverChange={(hovering) => setHoveredId(hovering ? n.id : null)}
-            />
-          ))}
+          <g transform={`translate(${tx} ${ty}) scale(${scale})`}>
+            {nodes.map((n) => (
+              <PortraitMark
+                key={n.id}
+                record={n.record}
+                x={n.x ?? 0}
+                y={n.y ?? 0}
+                r={n.r}
+                onHoverChange={(hovering) => setHoveredId(hovering ? n.id : null)}
+              />
+            ))}
+          </g>
         </svg>
         {hoveredNode && (
-          <div
-            className="node-tooltip"
-            style={{ left: hoveredNode.x ?? 0, top: (hoveredNode.y ?? 0) - hoveredNode.r }}
-          >
+          <div className="node-tooltip" style={{ left: tooltipLeft, top: tooltipTop }}>
             {describeResponse(hoveredNode.record)}
           </div>
         )}
@@ -80,7 +87,7 @@ export default function DisplayPage() {
           Reset wall
         </button>
       </div>
-      <Legend count={records.length} />
+      <Legend count={records.length} clusterBy={clusterBy} onClusterByChange={setClusterBy} />
     </div>
   );
 }
