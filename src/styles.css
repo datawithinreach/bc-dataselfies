@@ -75,6 +75,24 @@ body {
   font-size: 14px;
 }
 
+.help-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: 1px solid var(--gold);
+  color: var(--maroon);
+  padding: 8px 16px;
+  font-size: 14px;
+  font-family: system-ui, sans-serif;
+  font-weight: 600;
+  border-radius: 6px;
+  text-decoration: none;
+}
+
+.help-btn:hover {
+  background: #fbf3e6;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -547,4 +565,100 @@ body {
   margin: 4px 0 0;
   font-size: 11px;
   color: var(--warm-gray);
+}
+
+/* ---------- Help page ---------- */
+
+/* Deliberately not using the shared ".page" class here: that class is
+   forced to `display: none !important` under @media print so the
+   button-pin print flow (PrintButton's portaled .print-sheet) can hide
+   the rest of the app. This page needs to print normally instead. */
+.help-page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 32px 24px 96px;
+}
+
+.help-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 36px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.help-header h1 {
+  margin: 0 0 4px;
+  font-size: 26px;
+  color: var(--maroon);
+}
+
+.help-header p {
+  margin: 0;
+  color: var(--warm-gray);
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+}
+
+.help-header-actions {
+  display: flex;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.help-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+}
+
+.help-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 340px) 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.help-shot img {
+  width: 100%;
+  display: block;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.help-text h2 {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--maroon);
+}
+
+.help-text p {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #3a332c;
+}
+
+@media (max-width: 640px) {
+  .help-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media print {
+  /* The rest of the app (submit/display) hides ".page" outright for
+     print, but the help page has no isolated print layout of its own —
+     it prints as itself, just with the nav chrome stripped out and each
+     step kept from splitting awkwardly across a page break. */
+  .help-header-actions {
+    display: none;
+  }
+  .help-row {
+    break-inside: avoid;
+  }
 }

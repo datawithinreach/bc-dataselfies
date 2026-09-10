@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { nanoid } from "nanoid";
 import type { ResponseInput, ResponseRecord } from "../../shared/questions";
 import {
@@ -143,6 +144,9 @@ export default function SubmitPage() {
           <h1>BC Data Selfies</h1>
           <p>245 Beacon St. Open House &middot; Computer Science</p>
         </div>
+        <Link className="help-btn" to="/help">
+          Help
+        </Link>
       </header>
 
       <form onSubmit={handleSubmit} className="form">

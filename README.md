@@ -11,9 +11,11 @@ Inspired by Giorgia Lupi's [Data Selfies at TED
 
 ## How it's built
 
-- One static app, two routes, **no server, no internet, no database**:
+- One static app, three routes, **no server, no internet, no database**:
   - `#/submit` — the questionnaire (laptop)
   - `#/display` — the live wall + legend (monitor)
+  - `#/help` — a printable, illustrated walkthrough of the whole app,
+    linked from the "Help" button on `/submit`
   - It uses hash-based routing (`HashRouter`) specifically so the app can be
     served as plain static files — including from GitHub Pages, which has no
     server-side rewrite for client-side routes.
@@ -147,3 +149,12 @@ each time.
   the top of its tooltip, and clicking a portrait opens a panel with the
   same details plus a "Print for a button pin" button, so a name can be
   matched back to a specific person and reprinted from the wall itself.
+- **The `/help` walkthrough** (`src/pages/HelpPage.tsx`) is a fixed list of
+  steps, each pairing a screenshot from `src/assets/help/` with a short
+  description. The screenshots are static PNGs bundled at build time, not
+  generated live — if the UI changes enough that they go stale, retake them
+  (any screenshot tool works) and swap the files in `src/assets/help/`,
+  keeping the same filenames or updating the imports at the top of
+  `HelpPage.tsx`. It prints via the normal browser print dialog (not the
+  isolated single-circle print flow `PrintButton` uses) with the header
+  buttons hidden and each step kept from splitting across a page break.
