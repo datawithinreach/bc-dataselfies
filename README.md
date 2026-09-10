@@ -114,16 +114,18 @@ the printer has loaded — it deliberately doesn't try to force a custom small
 page size, since browsers don't honor that reliably).
 
 Sized for the clear snap-together button badges (3" outer shell, 2.68"
-inner opening the paper insert has to clear) — prints the portrait at 2.5",
-comfortably under that opening rather than right up against it. If you're
-using a different button product, change `DESIGN_IN` there — for a crimped
-metal pin-back button instead (where the design bleeds to the edge and a
-ring around it folds under the backing), you'd want it sized *larger* than
-the visible face rather than smaller.
+inner opening the paper insert has to clear) — prints the portrait at
+2.68", right at the opening size for the fullest fit. That leaves no spare
+margin, so cut carefully; if that's too tight in practice, drop
+`DESIGN_IN` back down (2.5" leaves a comfortable ~0.18" margin all round).
+If you're using a different button product, change `DESIGN_IN` there —
+for a crimped metal pin-back button instead (where the design bleeds to
+the edge and a ring around it folds under the backing), you'd want it
+sized *larger* than the visible face rather than smaller.
 
 **Before the event**, print one test button and check the browser's print
 dialog has **scale set to 100%** — "Fit to page"/"Shrink to fit" will print
-the design smaller than the real 2.5", risking too loose a fit. That's a
+the design smaller than the real 2.68", risking too loose a fit. That's a
 one-time setting per browser/printer, not something visitors need to touch
 each time.
 

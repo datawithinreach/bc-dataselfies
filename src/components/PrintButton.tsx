@@ -5,10 +5,10 @@ import PortraitMark from "./PortraitMark";
 // Product spec for the clear snap-together button badges: 3" outer shell,
 // 2.68" inner opening. Unlike a crimped metal pin-back button, nothing here
 // folds under — the whole printed circle stays visible, it just has to
-// physically clear the 2.68" opening to snap in. Printed a bit under that,
-// not right up against the max, so it comfortably clears the opening even
-// with imprecise scissor-cutting.
-const DESIGN_IN = 2.5;
+// physically clear the 2.68" opening to snap in. Printed at the opening
+// size itself (not under it) per explicit request, so cutting has to be
+// reasonably careful — there's no spare margin at this size.
+const DESIGN_IN = 2.68;
 const R = 90;
 // PortraitMark's outline circle is stroked *on* the r=R path, so half its
 // stroke width (r*0.035, per PortraitMark.tsx) renders just outside R. A
