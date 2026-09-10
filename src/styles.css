@@ -113,6 +113,11 @@ body {
   font-family: inherit;
 }
 
+.textarea-input {
+  resize: vertical;
+  min-height: 64px;
+}
+
 .options {
   display: flex;
   flex-direction: column;
@@ -251,9 +256,16 @@ body {
   /* .print-sheet is portaled to a direct sibling of .page, not nested inside
      it, specifically so this can just hide the whole page outright instead
      of relying on visibility (which leaves layout height behind and can
-     paginate a spurious blank second page). */
+     paginate a spurious blank second page).
+     !important because .page always shares an element with a second class
+     that also sets `display` (.thankyou, .display-page, ...) — those rules
+     have equal specificity to this one, so without !important whichever of
+     them happens to be defined later in this file wins the cascade and
+     silently un-hides the page during print (this bit the /display wall:
+     .display-page's `display: flex` is defined below this block, so it was
+     printing the whole wall + legend instead of just the selfie). */
   .page {
-    display: none;
+    display: none !important;
   }
   .print-sheet {
     display: flex;
@@ -318,6 +330,15 @@ body {
 .tooltip-name {
   font-weight: 700;
   margin-bottom: 4px;
+}
+
+.tooltip-hint {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  font-style: italic;
 }
 
 .node-tooltip-selected {

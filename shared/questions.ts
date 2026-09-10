@@ -93,7 +93,7 @@ export const diningHallOptions: DotCountOption[] = [
   { value: "coro", label: "CoRo Cafe", dots: 6 },
 ];
 
-export type ClusterField = Exclude<keyof ResponseInput, "name">;
+export type ClusterField = Exclude<keyof ResponseInput, "name" | "comment">;
 
 // Order here also determines the legend's group order.
 export const clusterableFields: { field: ClusterField; options: Option[] }[] = [
@@ -115,6 +115,9 @@ export interface ResponseInput {
   rules: string;
   aiFuture: string;
   diningHall: string;
+  // Optional free-form note. Shown only in the /display hover tooltip —
+  // never rendered on the portrait mark itself.
+  comment: string;
 }
 
 export interface ResponseRecord extends ResponseInput {
@@ -131,7 +134,7 @@ export function findOption<T extends Option>(options: T[], value: string): T {
 /**
  * Human-readable summary of a response's answers, for the hover tooltip on
  * /display. Deliberately leaves the name out — it's collected but never
- * shown anywhere on that page.
+ * shown anywhere on that page (DisplayPage adds it separately, above this).
  */
 export function describeResponse(record: ResponseRecord): string {
   const affiliation = findOption(affiliationOptions, record.affiliation);
@@ -141,15 +144,17 @@ export function describeResponse(record: ResponseRecord): string {
   const rules = findOption(rulesOptions, record.rules);
   const aiFuture = findOption(aiFutureOptions, record.aiFuture);
   const diningHall = findOption(diningHallOptions, record.diningHall);
-  return [
+  const lines = [
     `${affiliation.label} — ${school.label}`,
     `${continent.label} · ${chronotype.label}`,
     `Rules: ${rules.label} · AI's future: ${aiFuture.label}`,
     `Dining hall: ${diningHall.label}`,
-  ].join("\n");
+  ];
+  if (record.comment) lines.push(`"${record.comment}"`);
+  return lines.join("\n");
 }
 
-const VALID_VALUES: Record<Exclude<keyof ResponseInput, "name">, Set<string>> = {
+const VALID_VALUES: Record<Exclude<keyof ResponseInput, "name" | "comment">, Set<string>> = {
   affiliation: new Set(affiliationOptions.map((o) => o.value)),
   school: new Set(schoolOptions.map((o) => o.value)),
   continent: new Set(continentOptions.map((o) => o.value)),
@@ -174,6 +179,7 @@ export function sanitizeResponseInput(input: unknown): ResponseInput | null {
     if (typeof value !== "string" || !VALID_VALUES[field].has(value)) return null;
   }
   const name = typeof record.name === "string" ? record.name.trim().slice(0, 80) : "";
+  const comment = typeof record.comment === "string" ? record.comment.trim().slice(0, 300) : "";
   return {
     name,
     affiliation: record.affiliation as string,
@@ -183,5 +189,6 @@ export function sanitizeResponseInput(input: unknown): ResponseInput | null {
     rules: record.rules as string,
     aiFuture: record.aiFuture as string,
     diningHall: record.diningHall as string,
+    comment,
   };
 }

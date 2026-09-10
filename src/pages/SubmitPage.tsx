@@ -95,6 +95,7 @@ export default function SubmitPage() {
       rules: draft.rules!,
       aiFuture: draft.aiFuture!,
       diningHall: draft.diningHall!,
+      comment: (draft.comment ?? "").trim().slice(0, 300),
       createdAt: Date.now(),
     };
     addResponse(record);
@@ -165,6 +166,22 @@ export default function SubmitPage() {
         <RadioQuestion title="When it comes to the rules, do you:" field="rules" options={rulesOptions} draft={draft} onChange={set} />
         <RadioQuestion title="AI's future is..." field="aiFuture" options={aiFutureOptions} draft={draft} onChange={set} />
         <RadioQuestion title="Your favorite dining hall is..." field="diningHall" options={diningHallOptions} draft={draft} onChange={set} />
+
+        <fieldset className="question">
+          <legend>Anything else?</legend>
+          <p className="hint">
+            Optional &mdash; a comment, a joke, whatever. Only shown if someone hovers your portrait on the big
+            screen.
+          </p>
+          <textarea
+            className="text-input textarea-input"
+            maxLength={300}
+            rows={3}
+            value={draft.comment ?? ""}
+            onChange={(e) => set("comment", e.target.value)}
+            placeholder="(optional)"
+          />
+        </fieldset>
 
         {error && <p className="error">{error}</p>}
 

@@ -91,6 +91,7 @@ export default function DisplayPage() {
           <div className="node-tooltip" style={screenPos(tooltipNode)}>
             <div className="tooltip-name">{tooltipNode.record.name}</div>
             {describeResponse(tooltipNode.record)}
+            <div className="tooltip-hint">Click to print</div>
           </div>
         )}
         {selectedNode && (
