@@ -5,6 +5,7 @@ import { useForceLayout } from "../lib/useForceLayout";
 import { useZoomToFit } from "../lib/useZoomToFit";
 import { resetResponses } from "../lib/storage";
 import PortraitMark from "../components/PortraitMark";
+import PrintButton from "../components/PrintButton";
 import Legend from "../components/Legend";
 
 function useElementSize<T extends HTMLElement>() {
@@ -48,17 +49,26 @@ export default function DisplayPage() {
   const nodes = useForceLayout(records, clusterBy);
   const { scale, tx, ty } = useZoomToFit(nodes, width, height);
   const [hoveredId, setHoveredId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const hoveredNode = hoveredId ? nodes.find((n) => n.id === hoveredId) : undefined;
-  // Nodes live in the force sim's world space; the tooltip is a plain HTML
-  // element, so its screen position has to go through the same zoom-to-fit
-  // transform the <g> below applies to the SVG contents.
-  const tooltipLeft = hoveredNode ? tx + (hoveredNode.x ?? 0) * scale : 0;
-  const tooltipTop = hoveredNode ? ty + ((hoveredNode.y ?? 0) - hoveredNode.r) * scale : 0;
+  const selectedNode = selectedId ? nodes.find((n) => n.id === selectedId) : undefined;
+  // A selected node's panel takes over the spot the hover tooltip would
+  // otherwise use — showing both at once for the same node would just
+  // double up the same info.
+  const tooltipNode = selectedId ? undefined : hoveredNode;
+
+  // Nodes live in the force sim's world space; both the tooltip and the
+  // selected-node panel are plain HTML elements, so their screen position
+  // has to go through the same zoom-to-fit transform the <g> below applies
+  // to the SVG contents.
+  function screenPos(node: { x?: number; y?: number; r: number }) {
+    return { left: tx + (node.x ?? 0) * scale, top: ty + ((node.y ?? 0) - node.r) * scale };
+  }
 
   return (
     <div className="page display-page">
-      <div className="canvas" ref={canvasRef}>
+      <div className="canvas" ref={canvasRef} onClick={() => setSelectedId(null)}>
         <svg width={width} height={height}>
           <g transform={`translate(${tx} ${ty}) scale(${scale})`}>
             {nodes.map((n) => (
@@ -69,13 +79,34 @@ export default function DisplayPage() {
                 y={n.y ?? 0}
                 r={n.r}
                 onHoverChange={(hovering) => setHoveredId(hovering ? n.id : null)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedId((id) => (id === n.id ? null : n.id));
+                }}
               />
             ))}
           </g>
         </svg>
-        {hoveredNode && (
-          <div className="node-tooltip" style={{ left: tooltipLeft, top: tooltipTop }}>
-            {describeResponse(hoveredNode.record)}
+        {tooltipNode && (
+          <div className="node-tooltip" style={screenPos(tooltipNode)}>
+            <div className="tooltip-name">{tooltipNode.record.name}</div>
+            {describeResponse(tooltipNode.record)}
+          </div>
+        )}
+        {selectedNode && (
+          <div
+            className="node-tooltip node-tooltip-selected"
+            style={screenPos(selectedNode)}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="tooltip-close" onClick={() => setSelectedId(null)} aria-label="Close">
+              &times;
+            </button>
+            <div className="tooltip-name">{selectedNode.record.name}</div>
+            {describeResponse(selectedNode.record)}
+            <div className="tooltip-print">
+              <PrintButton record={selectedNode.record} />
+            </div>
           </div>
         )}
         {records.length === 0 && (

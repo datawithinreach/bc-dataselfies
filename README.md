@@ -142,5 +142,8 @@ each time.
   formation grows. See `clusterableFields` in `shared/questions.ts` for the
   list of clusterable questions and `src/lib/useForceLayout.ts` for the
   packing logic.
-- **Names are collected but never rendered** on `/display` — they're only
-  stored alongside the other answers in `localStorage`, per BC CS's request.
+- **Names are never shown on the portrait mark itself** (only handwritten
+  initials) — but hovering a portrait on `/display` shows the full name at
+  the top of its tooltip, and clicking a portrait opens a panel with the
+  same details plus a "Print for a button pin" button, so a name can be
+  matched back to a specific person and reprinted from the wall itself.

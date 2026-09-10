@@ -1,3 +1,4 @@
+import type { MouseEvent } from "react";
 import type { ResponseRecord } from "../../shared/questions";
 import {
   affiliationOptions,
@@ -24,7 +25,7 @@ export interface PortraitMarkProps {
   x?: number;
   y?: number;
   r: number;
-  onClick?: () => void;
+  onClick?: (e: MouseEvent<SVGGElement>) => void;
   onHoverChange?: (hovering: boolean) => void;
 }
 

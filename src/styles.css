@@ -315,6 +315,60 @@ body {
   z-index: 5;
 }
 
+.tooltip-name {
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.node-tooltip-selected {
+  /* Unlike the plain hover tooltip, this one holds a real button (Print),
+     so it has to accept clicks instead of passing them through. Its own
+     click handler stops propagation so pressing Print (or anything else
+     inside) doesn't bubble to the canvas's click-to-deselect handler. */
+  pointer-events: auto;
+  cursor: default;
+  padding-top: 22px;
+  max-width: 240px;
+  z-index: 6;
+}
+
+.tooltip-close {
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  background: none;
+  border: none;
+  color: #fff;
+  opacity: 0.6;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 2px 6px;
+}
+
+.tooltip-close:hover {
+  opacity: 1;
+}
+
+.tooltip-print {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.tooltip-print .secondary {
+  width: 100%;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #fff;
+  font-size: 12px;
+  padding: 8px 10px;
+}
+
+.tooltip-print .secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 .reset-btn {
   position: absolute;
   bottom: 12px;
