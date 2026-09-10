@@ -169,10 +169,7 @@ export default function SubmitPage() {
 
         <fieldset className="question">
           <legend>Anything else?</legend>
-          <p className="hint">
-            Optional &mdash; a comment, a joke, whatever. Only shown if someone hovers your portrait on the big
-            screen.
-          </p>
+          <p className="hint">Optional &mdash; a comment, a joke, whatever.</p>
           <textarea
             className="text-input textarea-input"
             maxLength={300}
