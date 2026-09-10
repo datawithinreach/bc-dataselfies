@@ -125,6 +125,11 @@ export default function SubmitPage() {
             </button>
             <PrintButton record={submitted} />
           </div>
+          <p className="thankyou-instructions">
+            Want to keep yours? Print it, cut it out, and snap it into a button pin.
+            <br />
+            Then tap <strong>Make another</strong> to leave this ready for the next person.
+          </p>
         </div>
       </div>
     );

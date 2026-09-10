@@ -215,6 +215,18 @@ body {
   align-self: center;
 }
 
+.thankyou-instructions {
+  margin: 18px 0 0;
+  font-family: system-ui, sans-serif;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--warm-gray);
+}
+
+.thankyou-instructions strong {
+  color: var(--maroon);
+}
+
 .secondary {
   background: none;
   border: 1px solid var(--gold);
